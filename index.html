@@ -1,0 +1,2973 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0d12" id="metaThemeColor" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>DuoPay — Gestão de Assinaturas</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root, [data-theme="dark"] {
+      --bg-primary: #0d0d12;
+      --bg-secondary: #15151e;
+      --bg-elevated: rgba(25, 25, 36, 0.82);
+      --bg-glass: rgba(20, 20, 30, 0.86);
+      --bg-input: #111118;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(139, 92, 246, 0.55);
+      --accent-violet: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.28);
+      --cta-bg: #ffffff;
+      --cta-text: #09090d;
+      --cta-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.18);
+      --card-gradient: linear-gradient(135deg, rgba(42, 39, 64, 0.72) 0%, rgba(20, 20, 30, 0.92) 100%);
+      --Segmented-bg: #12121a;
+      --Segmented-active: #252336;
+    }
+
+    [data-theme="amoled"] {
+      --bg-primary: #000000;
+      --bg-secondary: #07070b;
+      --bg-elevated: rgba(10, 10, 15, 0.95);
+      --bg-glass: rgba(5, 5, 8, 0.96);
+      --bg-input: #060609;
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --text-muted: #52525b;
+      --border-subtle: rgba(255, 255, 255, 0.11);
+      --border-focus: rgba(167, 139, 250, 0.7);
+      --accent-violet: #8b5cf6;
+      --accent-glow: rgba(139, 92, 246, 0.18);
+      --cta-bg: #ffffff;
+      --cta-text: #000000;
+      --cta-shadow: 0 8px 24px -4px rgba(255, 255, 255, 0.22);
+      --card-gradient: linear-gradient(135deg, rgba(24, 20, 38, 0.95) 0%, rgba(5, 5, 8, 0.98) 100%);
+      --Segmented-bg: #08080c;
+      --Segmented-active: #181624;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f3f4f8;
+      --bg-secondary: #ffffff;
+      --bg-elevated: rgba(255, 255, 255, 0.94);
+      --bg-glass: rgba(255, 255, 255, 0.92);
+      --bg-input: #f1f2f6;
+      --text-primary: #0f0f16;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border-subtle: rgba(15, 23, 42, 0.08);
+      --border-focus: rgba(109, 40, 217, 0.45);
+      --accent-violet: #6d28d9;
+      --accent-glow: rgba(109, 40, 217, 0.10);
+      --cta-bg: #0f0f16;
+      --cta-text: #ffffff;
+      --cta-shadow: 0 10px 25px -5px rgba(15, 15, 22, 0.25);
+      --card-gradient: linear-gradient(135deg, #1e1b2e 0%, #0f0f17 100%);
+      --Segmented-bg: #e5e7ef;
+      --Segmented-active: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Ambient purple radial glow inspired by the reference image */
+    .ambient-glow {
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 480px;
+      height: 320px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Mobile App Shell */
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+      min-height: 100dvh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-primary);
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.55);
+    }
+
+    @media (min-width: 520px) {
+      .app-shell {
+        border-left: 1px solid var(--border-subtle);
+        border-right: 1px solid var(--border-subtle);
+      }
+    }
+
+    .surface-card {
+      background: var(--bg-elevated);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .surface-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      transition: border-color 0.2s ease;
+    }
+    .surface-input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+
+    /* Metallic Visa-style hero card from reference image */
+    .fintech-hero-card {
+      background: var(--card-gradient);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+    .fintech-hero-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -30%;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.32) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* High contrast Pill CTA button from reference image ("Next", "Connect with Stripe") */
+    .btn-pill-cta {
+      background-color: var(--cta-bg);
+      color: var(--cta-text);
+      box-shadow: var(--cta-shadow);
+      border-radius: 9999px;
+      font-weight: 700;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .btn-pill-cta:active {
+      transform: scale(0.97);
+    }
+
+    /* Segmented Pill Switcher ("New card | Customers" in reference) */
+    .segmented-box {
+      background-color: var(--Segmented-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 9999px;
+      padding: 4px;
+    }
+    .segmented-item {
+      border-radius: 9999px;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .segmented-item.active {
+      background-color: var(--Segmented-active);
+      color: var(--text-primary);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+    }
+
+    /* Jagged Receipt Ticket Edge ("Payment receipt" in middle phone of reference) */
+    .receipt-ticket {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .receipt-ticket::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: radial-gradient(circle, var(--bg-primary) 4px, transparent 5px);
+      background-size: 16px 12px;
+      background-position: top center;
+    }
+
+    .text-sec { color: var(--text-secondary); }
+    .text-mut { color: var(--text-muted); }
+
+    /* Hide scrollbar for horizontal pills */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ==========================================================
+       60FPS GPU-ACCELERATED FINTECH ANIMATIONS & SPRING PHYSICS
+    =========================================================== */
+    :root {
+      --spring-easing: cubic-bezier(0.22, 1, 0.36, 1);
+      --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* 1. Ambient Glow Floating Pulse */
+    @keyframes ambientPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+      50% { transform: translateX(-46%) scale(1.12); opacity: 1; }
+    }
+    .ambient-glow {
+      animation: ambientPulse 9s ease-in-out infinite;
+      will-change: transform, opacity;
+    }
+
+    /* 2. Tab View Directional Spring Transitions */
+    @keyframes tabEnterRight {
+      from { opacity: 0; transform: translate3d(22px, 0, 0) scale(0.985); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    @keyframes tabEnterLeft {
+      from { opacity: 0; transform: translate3d(-22px, 0, 0) scale(0.985); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    .tab-anim-right {
+      animation: tabEnterRight 0.38s var(--spring-easing) forwards;
+      will-change: transform, opacity;
+    }
+    .tab-anim-left {
+      animation: tabEnterLeft 0.38s var(--spring-easing) forwards;
+      will-change: transform, opacity;
+    }
+
+    /* 3. Staggered Cascade Entrance for Cards & Rows */
+    @keyframes staggerFadeUp {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 14px, 0) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+    .stagger-item {
+      opacity: 0;
+      animation: staggerFadeUp 0.42s var(--spring-easing) forwards;
+      animation-delay: calc(var(--stagger-idx, 0) * 42ms);
+      will-change: transform, opacity;
+    }
+
+    /* 4. Metallic Hero Card Shimmer Sheen & Interactive 3D Tilt */
+    @keyframes metallicSheen {
+      0% { transform: translateX(-140%) skewX(-24deg); }
+      35%, 100% { transform: translateX(220%) skewX(-24deg); }
+    }
+    .fintech-hero-card {
+      transition: transform 0.28s var(--spring-easing), box-shadow 0.28s var(--spring-easing);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .fintech-hero-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 55%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.07) 50%,
+        transparent 100%
+      );
+      transform: translateX(-140%) skewX(-24deg);
+      animation: metallicSheen 7.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .fintech-hero-card:active {
+      transform: scale(0.982) rotateX(2deg);
+    }
+
+    /* 5. Spring Tactile Press & Ripple Feedback */
+    button, .surface-card, .segmented-item {
+      transition:
+        transform 0.22s var(--spring-bounce),
+        background-color 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease,
+        opacity 0.2s ease;
+    }
+    .btn-pill-cta {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.24s var(--spring-bounce), box-shadow 0.24s ease;
+    }
+    .btn-pill-cta:active {
+      transform: scale(0.94);
+    }
+    .spring-tap:active {
+      transform: scale(0.95);
+    }
+
+    /* 6. Modal & Bottom Sheet Spring Animations */
+    @keyframes backdropFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes backdropFadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @keyframes sheetSlideUp {
+      from { opacity: 0; transform: translate3d(0, 48px, 0) scale(0.96); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    @keyframes sheetSlideDown {
+      from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+      to { opacity: 0; transform: translate3d(0, 42px, 0) scale(0.96); }
+    }
+    .modal-backdrop-enter {
+      animation: backdropFadeIn 0.24s ease forwards;
+    }
+    .modal-backdrop-exit {
+      animation: backdropFadeOut 0.2s ease forwards;
+    }
+    .modal-sheet-enter {
+      animation: sheetSlideUp 0.36s var(--spring-easing) forwards;
+      will-change: transform, opacity;
+    }
+    .modal-sheet-exit {
+      animation: sheetSlideDown 0.2s ease forwards;
+      will-change: transform, opacity;
+    }
+
+    /* 7. Payment Receipt SVG Checkmark Draw & Ticket Spring Unfold */
+    @keyframes checkCirclePop {
+      0% { transform: scale(0.4); opacity: 0; }
+      65% { transform: scale(1.14); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes checkStrokeDraw {
+      from { stroke-dashoffset: 36; }
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes receiptUnfold {
+      0% { opacity: 0; transform: translate3d(0, 28px, 0) scale(0.95); }
+      100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    .receipt-check-badge {
+      animation: checkCirclePop 0.52s var(--spring-bounce) forwards;
+    }
+    .receipt-check-path {
+      stroke-dasharray: 36;
+      stroke-dashoffset: 36;
+      animation: checkStrokeDraw 0.45s cubic-bezier(0.65, 0, 0.35, 1) 0.18s forwards;
+    }
+    .receipt-ticket-anim {
+      opacity: 0;
+      animation: receiptUnfold 0.48s var(--spring-easing) 0.12s forwards;
+    }
+
+    /* 8. Bottom Navigation Sliding Glow Indicator */
+    .nav-indicator-pill {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      width: calc((100% - 24px) / 5);
+      left: 12px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(139, 92, 246, 0.08));
+      border: 1px solid rgba(139, 92, 246, 0.28);
+      box-shadow: 0 4px 16px -2px var(--accent-glow);
+      transition: transform 0.38s var(--spring-easing);
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <!-- MAIN MOBILE SHELL -->
+  <div class="app-shell pb-28">
+
+    <!-- TOP HEADER (INSPIRED BY REFERENCE IMAGE: CIRCULAR AVATAR LEFT, ACTIONS RIGHT) -->
+    <header class="sticky top-0 z-30 px-4 pt-3.5 pb-3 backdrop-blur-xl bg-opacity-80" style="background-color: var(--bg-glass); border-bottom: 1px solid var(--border-subtle);">
+      <div class="flex items-center justify-between gap-2">
+        <!-- Left: Active Partner Avatar + Editable Switcher -->
+        <button onclick="openPartnerProfileModal()" class="flex items-center gap-2.5 group text-left active:scale-95 transition" title="Trocar Sócio ou Editar Nomes">
+          <div id="headerAvatarCircle" class="w-9 h-9 rounded-full border border-white/20 bg-white/5 flex items-center justify-center font-bold text-xs tracking-tight relative">
+            <span id="headerPartnerInitials">S1</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-black absolute -bottom-0.5 -right-0.5"></span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1">
+              <span id="headerActivePartnerName" class="text-xs font-bold tracking-tight">Sócio 1</span>
+              <i class="ph-bold ph-caret-down text-[10px] text-sec"></i>
+            </div>
+            <span class="text-[10px] text-sec block leading-none">Toque p/ trocar ou editar</span>
+          </div>
+        </button>
+
+        <!-- Center: Compact Month Switcher -->
+        <div class="flex items-center gap-1 px-2 py-1 rounded-full border" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <button onclick="changeCompetenceMonth(-1)" class="w-6 h-6 rounded-full flex items-center justify-center text-sec hover:text-white active:scale-90">
+            <i class="ph-bold ph-caret-left text-xs"></i>
+          </button>
+          <span id="headerCompetenceText" class="text-[11px] font-bold px-1 whitespace-nowrap">Nov 2026</span>
+          <button onclick="changeCompetenceMonth(1)" class="w-6 h-6 rounded-full flex items-center justify-center text-sec hover:text-white active:scale-90">
+            <i class="ph-bold ph-caret-right text-xs"></i>
+          </button>
+        </div>
+
+        <!-- Right: Theme Cycle + Notifications + APK -->
+        <div class="flex items-center gap-1.5">
+          <button onclick="cycleTheme()" id="themeCycleBtn" class="w-9 h-9 rounded-full border flex items-center justify-center active:scale-90 transition" style="background: var(--bg-input); border-color: var(--border-subtle);" title="Alternar Tema: Escuro / AMOLED / Claro">
+            <i id="themeCycleIcon" class="ph-bold ph-moon-stars text-base"></i>
+          </button>
+
+          <button onclick="openNotificationsModal()" class="relative w-9 h-9 rounded-full border flex items-center justify-center active:scale-90 transition" style="background: var(--bg-input); border-color: var(--border-subtle);" title="Central de Notificações">
+            <i class="ph-bold ph-bell text-base"></i>
+            <span id="headerNotifBadge" class="hidden absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-violet-600 text-white font-bold text-[10px] flex items-center justify-center">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 px-4 pt-4 space-y-5">
+
+      <!-- ==================================================
+           TAB 1: DASHBOARD (HERO VISA-STYLE CARD + METRICS)
+      =================================================== -->
+      <section id="tab-dashboard" class="tab-view space-y-4">
+
+        <!-- Hero Card (Inspired by Reference Image's Metallic Visa Card) -->
+        <div class="fintech-hero-card rounded-[28px] p-5 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-widest text-violet-300/90 font-bold block">RECEITA PREVISTA • <span id="heroMonthLabel">NOVEMBRO 2026</span></span>
+              <h2 id="dashExpectedTotal" class="text-3xl font-extrabold tracking-tight mt-1 font-mono-num">R$ 0,00</h2>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-extrabold tracking-widest italic opacity-90 block">DUOPAY</span>
+              <span id="syncStatusPill" class="inline-flex items-center gap-1 text-[10px] text-emerald-300 font-medium">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Sincronizado
+              </span>
+            </div>
+          </div>
+
+          <!-- Progress Bar & Card Number Style Metrics -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-300 font-mono-num tracking-wider">
+              <span id="dashPaidRatioText">RECEBIDO: R$ 0,00</span>
+              <span id="dashPaidPercentBadge" class="text-emerald-300 font-bold">0%</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div id="dashProgressBar" class="h-full bg-gradient-to-r from-violet-400 to-emerald-400 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Bottom Row like CARDHOLDER NAME & EXPIRY DATE in Reference -->
+          <div class="pt-1 flex items-center justify-between border-t border-white/10 text-xs">
+            <div>
+              <span class="text-[9px] uppercase tracking-widest text-slate-400 block"> <span id="heroP1Label">Sócio 1</span> (Recebido)</span>
+              <strong id="heroP1Value" class="font-bold text-sm text-white font-mono-num">R$ 0,00</strong>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase tracking-widest text-slate-400 block"><span id="heroP2Label">Sócio 2</span> (Recebido)</span>
+              <strong id="heroP2Value" class="font-bold text-sm text-white font-mono-num">R$ 0,00</strong>
+            </div>
+            <div class="text-right">
+              <span class="text-[9px] uppercase tracking-widest text-slate-400 block">CLIENTES ATIVOS</span>
+              <strong id="dashActiveClientsCount" class="font-bold text-sm text-emerald-300 font-mono-num">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Action Pill Button + Quick Add -->
+        <div class="flex items-center gap-2.5">
+          <button onclick="openClientModal()" class="btn-pill-cta flex-1 py-3.5 px-5 text-xs flex items-center justify-center gap-2">
+            <i class="ph-bold ph-plus text-sm"></i>
+            Adicionar Cliente
+          </button>
+          <button onclick="openPartnerNamesModal()" class="surface-card py-3.5 px-4 rounded-full text-xs font-semibold flex items-center gap-1.5 active:scale-95 transition">
+            <i class="ph-bold ph-users text-violet-400"></i>
+            Editar Sócios
+          </button>
+        </div>
+
+        <!-- 3 KPI Mini Pills (Recebido, Pendente, Atrasados) -->
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="surface-card rounded-2xl p-3">
+            <span class="text-[10px] text-sec font-semibold block">Recebido</span>
+            <strong id="kpiReceived" class="text-sm font-extrabold text-emerald-400 font-mono-num mt-0.5 block">R$ 0,00</strong>
+            <span id="kpiReceivedSub" class="text-[10px] text-mut">0 pagos</span>
+          </div>
+          <div class="surface-card rounded-2xl p-3">
+            <span class="text-[10px] text-sec font-semibold block">Pendente</span>
+            <strong id="kpiPending" class="text-sm font-extrabold text-amber-400 font-mono-num mt-0.5 block">R$ 0,00</strong>
+            <span id="kpiPendingSub" class="text-[10px] text-mut">0 em aberto</span>
+          </div>
+          <div class="surface-card rounded-2xl p-3">
+            <span class="text-[10px] text-sec font-semibold block">Em Atraso</span>
+            <strong id="kpiOverdueCount" class="text-sm font-extrabold text-rose-400 font-mono-num mt-0.5 block">0</strong>
+            <span id="kpiDueTodaySub" class="text-[10px] text-mut">0 vencem hoje</span>
+          </div>
+        </div>
+
+        <!-- Faturamento Individual Detalhado dos Sócios -->
+        <div class="surface-card rounded-3xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-sec">Faturamento por Sócio</h3>
+            </div>
+            <button onclick="openPartnerNamesModal()" class="text-[11px] font-semibold text-violet-400 flex items-center gap-1">
+              <i class="ph-bold ph-pencil-simple"></i> Renomear
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- Sócio 1 -->
+            <div class="p-3 rounded-2xl border" style="background: var(--bg-input); border-color: var(--border-subtle);">
+              <div class="flex items-center justify-between mb-1.5">
+                <span id="dashCardP1Name" class="text-xs font-bold truncate">Sócio 1</span>
+                <span id="dashCardP1Clients" class="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/15 text-violet-400 font-bold">0 cli</span>
+              </div>
+              <p class="text-[10px] text-sec">Recebido no mês</p>
+              <p id="dashCardP1Received" class="text-base font-extrabold text-emerald-400 font-mono-num">R$ 0,00</p>
+              <p class="text-[10px] text-mut mt-1">Previsto: <strong id="dashCardP1Expected" class="text-sec font-mono-num">R$ 0,00</strong></p>
+            </div>
+
+            <!-- Sócio 2 -->
+            <div class="p-3 rounded-2xl border" style="background: var(--bg-input); border-color: var(--border-subtle);">
+              <div class="flex items-center justify-between mb-1.5">
+                <span id="dashCardP2Name" class="text-xs font-bold truncate">Sócio 2</span>
+                <span id="dashCardP2Clients" class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold">0 cli</span>
+              </div>
+              <p class="text-[10px] text-sec">Recebido no mês</p>
+              <p id="dashCardP2Received" class="text-base font-extrabold text-emerald-400 font-mono-num">R$ 0,00</p>
+              <p class="text-[10px] text-mut mt-1">Previsto: <strong id="dashCardP2Expected" class="text-sec font-mono-num">R$ 0,00</strong></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Segmented Control: Vencem Hoje | Clientes Atrasados (Inspired by Reference Image's "New card | Customers") -->
+        <div class="space-y-3">
+          <div class="segmented-box grid grid-cols-2">
+            <button onclick="switchDashAlertView('today')" id="segDashToday" class="segmented-item active py-2.5 text-xs flex items-center justify-center gap-1.5">
+              <span>Vencem Hoje</span>
+              <span id="badgeDashToday" class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-400 font-bold">0</span>
+            </button>
+            <button onclick="switchDashAlertView('overdue')" id="segDashOverdue" class="segmented-item py-2.5 text-xs flex items-center justify-center gap-1.5">
+              <span>Atrasados</span>
+              <span id="badgeDashOverdue" class="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500/20 text-rose-400 font-bold">0</span>
+            </button>
+          </div>
+
+          <div id="dashAlertsContainer" class="space-y-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           TAB 2: CLIENTES (CLEAN INITIAL AVATAR ROWS)
+      =================================================== -->
+      <section id="tab-clients" class="tab-view hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-extrabold tracking-tight">Clientes</h2>
+            <p class="text-xs text-sec">Senhas criptografadas com AES-GCM</p>
+          </div>
+          <button onclick="openClientModal()" class="btn-pill-cta px-4 py-2.5 text-xs flex items-center gap-1.5">
+            <i class="ph-bold ph-user-plus"></i> Novo
+          </button>
+        </div>
+
+        <!-- Search Row like Reference Image ("Q Search") -->
+        <div class="relative">
+          <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-sec"></i>
+          <input
+            type="text"
+            id="clientSearchInput"
+            oninput="renderClientsList()"
+            placeholder="Pesquisar cliente, usuário ou WhatsApp..."
+            class="surface-input w-full pl-11 pr-4 py-3 rounded-2xl text-xs"
+          />
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <select id="clientFilterPartner" onchange="renderClientsList()" class="surface-input px-3 py-2 rounded-full text-xs font-medium">
+            <option value="all">Sócios: Todos</option>
+            <option value="partner1" id="optClientPartner1">Sócio 1</option>
+            <option value="partner2" id="optClientPartner2">Sócio 2</option>
+            <option value="unassigned">Sem Responsável</option>
+          </select>
+          <select id="clientFilterStatus" onchange="renderClientsList()" class="surface-input px-3 py-2 rounded-full text-xs font-medium">
+            <option value="all">Status: Todos</option>
+            <option value="active">Somente Ativos</option>
+            <option value="inactive">Somente Inativos</option>
+          </select>
+        </div>
+
+        <!-- Clean Customer List (Inspired by KW Kobe Williams, ZJ Zackary Jones rows) -->
+        <div id="clientsListWrapper" class="surface-card rounded-3xl divide-y overflow-hidden" style="border-color: var(--border-subtle);">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- ==================================================
+           TAB 3: COBRANÇAS MENSAIS (CONTROLE RECORRENTE)
+      =================================================== -->
+      <section id="tab-payments" class="tab-view hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-extrabold tracking-tight">Mensalidades</h2>
+            <p class="text-xs text-sec">Quitação individual por mês com comprovante</p>
+          </div>
+          <button onclick="generateChargesForCurrentCompetence(true)" class="surface-card px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 active:scale-95">
+            <i class="ph-bold ph-arrows-clockwise text-violet-400"></i> Sincronizar Mês
+          </button>
+        </div>
+
+        <!-- Month / Year / Partner Filters -->
+        <div class="grid grid-cols-3 gap-2">
+          <select id="payMonthSelect" onchange="onBillingPeriodSelectChange()" class="surface-input px-3 py-2.5 rounded-2xl text-xs font-semibold">
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+          <select id="payYearSelect" onchange="onBillingPeriodSelectChange()" class="surface-input px-3 py-2.5 rounded-2xl text-xs font-semibold">
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+          </select>
+          <select id="payPartnerSelect" onchange="renderPaymentsList()" class="surface-input px-3 py-2.5 rounded-2xl text-xs font-semibold">
+            <option value="all">Todos Sócios</option>
+            <option value="partner1" id="optPayPartner1">Sócio 1</option>
+            <option value="partner2" id="optPayPartner2">Sócio 2</option>
+          </select>
+        </div>
+
+        <!-- Search Client inside Payments -->
+        <div class="relative">
+          <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-sec"></i>
+          <input
+            type="text"
+            id="paySearchInput"
+            oninput="renderPaymentsList()"
+            placeholder="Filtrar cobrança por nome do cliente..."
+            class="surface-input w-full pl-11 pr-4 py-2.5 rounded-2xl text-xs"
+          />
+        </div>
+
+        <!-- Status Segmented Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <button onclick="setPaymentStatusFilter('all')" id="payPill-all" class="px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition">Todos</button>
+          <button onclick="setPaymentStatusFilter('pendente')" id="payPill-pendente" class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition">Pendentes</button>
+          <button onclick="setPaymentStatusFilter('atrasado')" id="payPill-atrasado" class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition">Atrasados</button>
+          <button onclick="setPaymentStatusFilter('hoje')" id="payPill-hoje" class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition">Vencem Hoje</button>
+          <button onclick="setPaymentStatusFilter('pago')" id="payPill-pago" class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition">Pagos</button>
+        </div>
+
+        <!-- Filtered Summary Bar -->
+        <div class="surface-card rounded-2xl px-4 py-2.5 flex items-center justify-between text-xs">
+          <span class="text-sec">Listando <strong id="payCountLabel" class="text-primary">0</strong> cobranças</span>
+          <span class="text-sec">Total: <strong id="paySumLabel" class="text-emerald-400 font-mono-num">R$ 0,00</strong></span>
+        </div>
+
+        <!-- Monthly Charges List -->
+        <div id="paymentsListWrapper" class="space-y-2.5">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- ==================================================
+           TAB 4: DIVISÃO ENTRE SÓCIOS & NOMES PERSONALIZADOS
+      =================================================== -->
+      <section id="tab-partners" class="tab-view hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-extrabold tracking-tight">Sócios & Divisão</h2>
+            <p class="text-xs text-sec">Personalize os nomes e equilibre os clientes</p>
+          </div>
+          <button onclick="openPartnerNamesModal()" class="surface-card px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 text-violet-400">
+            <i class="ph-bold ph-pencil-simple"></i> Editar Nomes
+          </button>
+        </div>
+
+        <!-- Partner Cards Side by Side -->
+        <div class="grid grid-cols-1 gap-3">
+          <!-- Partner 1 Card -->
+          <div class="surface-card rounded-3xl p-4 space-y-3 stagger-item" style="--stagger-idx: 1">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div id="partnerTabAvatar1" class="w-10 h-10 rounded-full bg-violet-500/20 text-violet-400 font-extrabold text-xs flex items-center justify-center">S1</div>
+                <div>
+                  <h3 id="partnerTabName1" class="text-sm font-extrabold">Sócio 1</h3>
+                  <p id="partnerTabShare1" class="text-[11px] text-sec">0 clientes ativos</p>
+                </div>
+              </div>
+              <button onclick="openPartnerNamesModal()" class="p-2 rounded-full hover:bg-white/5 text-sec spring-tap">
+                <i class="ph-bold ph-pencil-simple text-sm"></i>
+              </button>
+            </div>
+            <!-- Animated Progress Bar for Partner 1 -->
+            <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div id="partnerTabBar1" class="h-full bg-violet-500 transition-all duration-700 ease-out" style="width: 0%"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t text-center" style="border-color: var(--border-subtle);">
+              <div>
+                <span class="text-[10px] text-sec block">Previsto</span>
+                <strong id="partnerTabExp1" class="text-xs font-bold font-mono-num">R$ 0,00</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-sec block">Recebido</span>
+                <strong id="partnerTabRec1" class="text-xs font-bold text-emerald-400 font-mono-num">R$ 0,00</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-sec block">Pendente</span>
+                <strong id="partnerTabPen1" class="text-xs font-bold text-amber-400 font-mono-num">R$ 0,00</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Partner 2 Card -->
+          <div class="surface-card rounded-3xl p-4 space-y-3 stagger-item" style="--stagger-idx: 2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div id="partnerTabAvatar2" class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold text-xs flex items-center justify-center">S2</div>
+                <div>
+                  <h3 id="partnerTabName2" class="text-sm font-extrabold">Sócio 2</h3>
+                  <p id="partnerTabShare2" class="text-[11px] text-sec">0 clientes ativos</p>
+                </div>
+              </div>
+              <button onclick="openPartnerNamesModal()" class="p-2 rounded-full hover:bg-white/5 text-sec spring-tap">
+                <i class="ph-bold ph-pencil-simple text-sm"></i>
+              </button>
+            </div>
+            <!-- Animated Progress Bar for Partner 2 -->
+            <div class="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div id="partnerTabBar2" class="h-full bg-emerald-500 transition-all duration-700 ease-out" style="width: 0%"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t text-center" style="border-color: var(--border-subtle);">
+              <div>
+                <span class="text-[10px] text-sec block">Previsto</span>
+                <strong id="partnerTabExp2" class="text-xs font-bold font-mono-num">R$ 0,00</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-sec block">Recebido</span>
+                <strong id="partnerTabRec2" class="text-xs font-bold text-emerald-400 font-mono-num">R$ 0,00</strong>
+              </div>
+              <div>
+                <span class="text-[10px] text-sec block">Pendente</span>
+                <strong id="partnerTabPen2" class="text-xs font-bold text-amber-400 font-mono-num">R$ 0,00</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto Equilibrium Action Button -->
+        <div class="surface-card rounded-3xl p-4 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h4 class="text-xs font-bold">Distribuição Automática Equilibrada</h4>
+              <p class="text-[11px] text-sec mt-0.5">Distribui os clientes que estão "Sem Responsável" equilibrando a carteira sem alterar os clientes já definidos.</p>
+            </div>
+            <span id="unassignedBadgeCount" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 shrink-0">0 fila</span>
+          </div>
+          <button onclick="runBalancedDistribution()" class="btn-pill-cta w-full py-3 text-xs flex items-center justify-center gap-2">
+            <i class="ph-bold ph-scales"></i>
+            Equilibrar Clientes Sem Responsável
+          </button>
+        </div>
+
+        <!-- Quick Assignment List -->
+        <div class="surface-card rounded-3xl p-4 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-sec">Atribuição Rápida por Cliente</h4>
+          <div id="partnerQuickAssignList" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           TAB 5: AJUSTES (LIMPO, PROFISSIONAL E DIRETO AO PONTO)
+      =================================================== -->
+      <section id="tab-settings" class="tab-view hidden space-y-4">
+        <div>
+          <h2 class="text-lg font-extrabold tracking-tight">Ajustes</h2>
+          <p class="text-xs text-sec">Personalização de temas, notificações do sistema, link global e segurança</p>
+        </div>
+
+        <!-- Theme Selector (Escuro, AMOLED, Claro) -->
+        <div class="surface-card rounded-3xl p-4 space-y-3">
+          <span class="text-xs font-bold block">Tema do Aplicativo</span>
+          <div class="segmented-box grid grid-cols-3">
+            <button onclick="applyTheme('dark')" id="themeBtn-dark" class="segmented-item py-2.5 text-xs flex items-center justify-center gap-1.5">
+              <i class="ph-bold ph-moon"></i> Escuro
+            </button>
+            <button onclick="applyTheme('amoled')" id="themeBtn-amoled" class="segmented-item py-2.5 text-xs flex items-center justify-center gap-1.5">
+              <i class="ph-fill ph-sparkle"></i> AMOLED
+            </button>
+            <button onclick="applyTheme('light')" id="themeBtn-light" class="segmented-item py-2.5 text-xs flex items-center justify-center gap-1.5">
+              <i class="ph-bold ph-sun"></i> Claro
+            </button>
+          </div>
+        </div>
+
+        <!-- Clean Android System Notifications Toggle -->
+        <div class="surface-card rounded-3xl p-4 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-2xl bg-violet-500/15 text-violet-400 flex items-center justify-center shrink-0">
+              <i class="ph-fill ph-bell-ringing text-xl"></i>
+            </div>
+            <div class="min-w-0">
+              <h3 class="text-xs font-bold">Notificações do Sistema Android</h3>
+              <p id="androidNotifStatusSub" class="text-[11px] text-sec truncate">Alertas na barra de status para vencimentos do dia e atrasos</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onclick="toggleAndroidSystemNotifications()"
+            id="androidNotifToggleBtn"
+            class="w-12 h-7 rounded-full p-1 transition-colors duration-200 flex items-center bg-white/10 shrink-0"
+            aria-label="Alternar Notificações do Sistema Android"
+          >
+            <span id="androidNotifToggleKnob" class="w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-200 translate-x-0"></span>
+          </button>
+        </div>
+
+        <!-- Global Service Link & Partner Names Form -->
+        <form onsubmit="saveGeneralSettings(event)" class="surface-card rounded-3xl p-4 space-y-3.5">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-sec">Link Global & Nomes dos Sócios</h3>
+
+          <div>
+            <label class="text-[11px] font-semibold text-sec block mb-1">Link Único do Serviço (Compartilhado com todos os clientes)</label>
+            <div class="flex gap-2">
+              <input type="url" id="cfgServiceUrl" required placeholder="https://painel.seuservico.com" class="surface-input flex-1 px-3.5 py-2.5 rounded-2xl text-xs" />
+              <button type="button" onclick="copyGlobalServiceLink()" class="surface-card px-3.5 rounded-2xl text-xs font-bold">Copiar</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-[11px] font-semibold text-sec block mb-1">Nome do 1º Sócio</label>
+              <input type="text" id="cfgPartner1Name" required placeholder="Ex: Thauan" class="surface-input w-full px-3.5 py-2.5 rounded-2xl text-xs font-bold" />
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-sec block mb-1">Nome do 2º Sócio</label>
+              <input type="text" id="cfgPartner2Name" required placeholder="Ex: Lucas" class="surface-input w-full px-3.5 py-2.5 rounded-2xl text-xs font-bold" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-pill-cta w-full py-3 text-xs">
+            Salvar Configurações
+          </button>
+        </form>
+
+        <!-- Backup JSON & Audit Logs -->
+        <div class="surface-card rounded-3xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sec">Backup & Histórico de Auditoria</h3>
+            <div class="flex gap-1.5">
+              <button onclick="exportDataBackup()" class="px-3 py-1.5 rounded-full text-[11px] font-bold border" style="background: var(--bg-input); border-color: var(--border-subtle);">Exportar JSON</button>
+              <label class="px-3 py-1.5 rounded-full text-[11px] font-bold border cursor-pointer" style="background: var(--bg-input); border-color: var(--border-subtle);">
+                Importar
+                <input type="file" accept=".json" onchange="importDataBackup(event)" class="hidden" />
+              </label>
+            </div>
+          </div>
+          <div id="auditLogList" class="space-y-1.5 max-h-52 overflow-y-auto pr-1">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM NAVIGATION BAR (FIXED INSIDE MOBILE SHELL WITH SLIDING SPRING INDICATOR) -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 z-30 w-full max-w-[480px] px-3 py-2 backdrop-blur-2xl" style="background-color: var(--bg-glass); border-top: 1px solid var(--border-subtle);">
+      <div id="navSlidingPill" class="nav-indicator-pill"></div>
+      <div class="grid grid-cols-5 gap-1 relative z-10">
+        <button onclick="switchTab('dashboard')" id="navBtn-dashboard" class="flex flex-col items-center justify-center py-1.5 rounded-2xl transition spring-tap">
+          <i class="ph-bold ph-cards text-xl transition-transform duration-200"></i>
+          <span class="text-[10px] font-semibold mt-0.5">Início</span>
+        </button>
+        <button onclick="switchTab('clients')" id="navBtn-clients" class="flex flex-col items-center justify-center py-1.5 rounded-2xl transition spring-tap">
+          <i class="ph-bold ph-users text-xl transition-transform duration-200"></i>
+          <span class="text-[10px] font-semibold mt-0.5">Clientes</span>
+        </button>
+        <button onclick="switchTab('payments')" id="navBtn-payments" class="flex flex-col items-center justify-center py-1.5 rounded-2xl transition spring-tap">
+          <i class="ph-bold ph-receipt text-xl transition-transform duration-200"></i>
+          <span class="text-[10px] font-semibold mt-0.5">Cobranças</span>
+        </button>
+        <button onclick="switchTab('partners')" id="navBtn-partners" class="flex flex-col items-center justify-center py-1.5 rounded-2xl transition spring-tap">
+          <i class="ph-bold ph-scales text-xl transition-transform duration-200"></i>
+          <span class="text-[10px] font-semibold mt-0.5">Sócios</span>
+        </button>
+        <button onclick="switchTab('settings')" id="navBtn-settings" class="flex flex-col items-center justify-center py-1.5 rounded-2xl transition spring-tap">
+          <i class="ph-bold ph-sliders-horizontal text-xl transition-transform duration-200"></i>
+          <span class="text-[10px] font-semibold mt-0.5">Ajustes</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ========================================================
+       MODAL 1: ADD / EDIT CLIENT (INSTANT CLOSE GUARANTEED)
+  ========================================================= -->
+  <div id="clientModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="surface-card w-full max-w-[480px] rounded-t-[32px] sm:rounded-[32px] p-5 max-h-[92dvh] overflow-y-auto space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 id="clientModalHeading" class="text-base font-extrabold">Novo Cliente</h3>
+          <p class="text-[11px] text-sec">Salvamento instantâneo com senha criptografada</p>
+        </div>
+        <button type="button" onclick="closeClientModal()" class="w-8 h-8 rounded-full flex items-center justify-center border" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
+      </div>
+
+      <form id="clientForm" onsubmit="handleSaveClient(event)" class="space-y-3">
+        <input type="hidden" id="fieldClientId" />
+
+        <div>
+          <label class="text-[11px] font-bold text-sec block mb-1">Nome Completo *</label>
+          <input type="text" id="fieldClientName" required placeholder="Ex: Kobe Williams" class="surface-input w-full px-3.5 py-2.5 rounded-2xl text-xs font-medium" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-sec block mb-1">WhatsApp *</label>
+            <input type="tel" id="fieldClientWhatsapp" required placeholder="11999998888" class="surface-input w-full px-3.5 py-2.5 rounded-2xl text-xs font-mono-num" />
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-sec block mb-1">Dia de Vencimento (1-31) *</label>
+            <input type="number" id="fieldClientDueDay" min="1" max="31" required value="10" class="surface-input w-full px-3.5 py-2.5 rounded-2xl text-xs font-bold font-mono-num" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 p-3 rounded-2xl border" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <div>
+            <label class="text-[10px] font-bold text-sec block mb-1">Usuário de Acesso *</label>
+            <input type="text" id="fieldClientUser" required placeholder="usuario.vip" class="surface-card w-full px-3 py-2 rounded-xl text-xs font-mono-num" />
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-sec flex items-center justify-between mb-1">
+              <span>Senha *</span>
+              <span class="text-[9px] text-emerald-400">AES-256</span>
+            </label>
+            <div class="relative">
+              <input type="password" id="fieldClientPass" required placeholder="••••••" class="surface-card w-full pl-3 pr-8 py-2 rounded-xl text-xs font-mono-num" />
+              <button type="button" onclick="toggleClientPassInput()" class="absolute right-2 top-1/2 -translate-y-1/2 text-sec">
+                <i id="fieldPassEye" class="ph-bold ph-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Value Segmented Picker (R$ 30, R$ 35, Custom) -->
+        <div>
+          <label class="text-[11px] font-bold text-sec block mb-1.5">Valor da Mensalidade *</label>
+          <div class="segmented-box grid grid-cols-3 mb-2">
+            <button type="button" onclick="pickPlanValue(30)" id="planBtn30" class="segmented-item active py-2 text-xs">R$ 30</button>
+            <button type="button" onclick="pickPlanValue(35)" id="planBtn35" class="segmented-item py-2 text-xs">R$ 35</button>
+            <button type="button" onclick="pickPlanValue('custom')" id="planBtnCustom" class="segmented-item py-2 text-xs">Outro</button>
+          </div>
+          <div id="customPriceBox" class="hidden">
+            <input type="number" step="0.01" min="1" id="fieldClientAmount" value="30.00" required placeholder="Digite o valor (R$)" class="surface-input w-full px-3.5 py-2.5 rounded-2xl text-xs font-bold font-mono-num" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-sec block mb-1">Sócio Responsável</label>
+            <select id="fieldClientPartner" class="surface-input w-full px-3 py-2.5 rounded-2xl text-xs font-semibold">
+              <option value="partner1" id="modalOptPartner1">Sócio 1</option>
+              <option value="partner2" id="modalOptPartner2">Sócio 2</option>
+              <option value="unassigned">Fila s/ Responsável</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-sec block mb-1">Status</label>
+            <select id="fieldClientStatus" class="surface-input w-full px-3 py-2.5 rounded-2xl text-xs font-semibold">
+              <option value="active">Ativo</option>
+              <option value="inactive">Inativo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center gap-2">
+          <button type="button" onclick="closeClientModal()" class="surface-card py-3.5 px-5 rounded-full text-xs font-bold">Cancelar</button>
+          <button type="submit" class="btn-pill-cta flex-1 py-3.5 text-xs">
+            Salvar Cliente
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 2: PAYMENT RECEIPT ("Thank you! Payment receipt" FROM REFERENCE IMAGE)
+  ========================================================= -->
+  <div id="receiptModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div id="receiptModalCard" class="surface-card w-full max-w-[390px] rounded-[34px] p-6 text-center space-y-5 shadow-2xl relative modal-sheet-enter">
+      <!-- Animated SVG Checkmark Circle from Reference Image -->
+      <div id="receiptCheckBadge" class="w-14 h-14 rounded-full bg-violet-500/20 border border-violet-400/35 text-violet-300 flex items-center justify-center mx-auto receipt-check-badge shadow-lg shadow-violet-500/20">
+        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none">
+          <path class="receipt-check-path" d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-2xl font-extrabold tracking-tight">Thank you!</h3>
+        <p class="text-xs text-sec">O pagamento mensal foi confirmado com sucesso.</p>
+      </div>
+
+      <!-- Ticket Receipt Box with Jagged Top Edge & Spring Unfold -->
+      <div id="receiptTicketBox" class="receipt-ticket receipt-ticket-anim p-4 text-left space-y-3">
+        <p class="text-xs font-bold text-center pb-2 border-b border-dashed" style="border-color: var(--border-subtle);">Payment receipt • Comprovante</p>
+
+        <div class="flex justify-between text-xs">
+          <span class="text-sec">Cliente</span>
+          <strong id="recClientName" class="font-bold">---</strong>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-sec">Valor Pago</span>
+          <strong id="recAmount" class="font-extrabold text-emerald-400 font-mono-num">R$ 0,00</strong>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-sec">Mês de Referência</span>
+          <strong id="recCompetence" class="font-semibold">11/2026</strong>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-sec">Sócio Responsável</span>
+          <strong id="recPartner" class="font-semibold">---</strong>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-sec">Confirmado por</span>
+          <strong id="recConfirmedBy" class="font-semibold text-violet-400">---</strong>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-sec">Data / Hora</span>
+          <span id="recDateTime" class="font-mono-num text-[11px]">---</span>
+        </div>
+        <div class="flex justify-between text-xs pt-2 border-t border-dashed" style="border-color: var(--border-subtle);">
+          <span class="text-sec">ID da Transação</span>
+          <span id="recTxId" class="font-mono-num text-[11px] text-sec">#TX-0000</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="button" onclick="shareReceiptText()" class="surface-card flex-1 py-3 rounded-full text-xs font-bold flex items-center justify-center gap-1.5">
+          <i class="ph-bold ph-copy"></i> Copiar Recibo
+        </button>
+        <button type="button" onclick="closeReceiptModal()" class="btn-pill-cta flex-1 py-3 text-xs">
+          Concluir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 3: CLIENT DETAILS, DECRYPTED CREDENTIALS & HISTORY
+  ========================================================= -->
+  <div id="clientDetailModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="surface-card w-full max-w-[480px] rounded-t-[32px] sm:rounded-[32px] p-5 max-h-[90dvh] overflow-y-auto space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div id="detAvatar" class="w-10 h-10 rounded-full bg-violet-500/20 text-violet-300 font-bold text-xs flex items-center justify-center">CL</div>
+          <div>
+            <h3 id="detName" class="text-base font-extrabold">Cliente</h3>
+            <p id="detSub" class="text-xs text-sec">R$ 30,00 • Dia 10</p>
+          </div>
+        </div>
+        <button onclick="closeClientDetailModal()" class="w-8 h-8 rounded-full flex items-center justify-center border" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Encrypted Credentials Card -->
+      <div class="p-3.5 rounded-2xl border space-y-2.5" style="background: var(--bg-input); border-color: var(--border-subtle);">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-sec">Credenciais + Link Único</span>
+          <button id="detCopyKitBtn" class="px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 text-[11px] font-bold flex items-center gap-1">
+            <i class="ph-bold ph-copy"></i> Copiar Acesso
+          </button>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="surface-card p-2.5 rounded-xl">
+            <span class="text-[10px] text-sec block">Usuário</span>
+            <strong id="detUser" class="font-mono-num">---</strong>
+          </div>
+          <div class="surface-card p-2.5 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-sec block">Senha</span>
+              <strong id="detPass" class="font-mono-num">••••••••</strong>
+            </div>
+            <button id="detTogglePassBtn" class="p-1.5 rounded-lg hover:bg-white/10 text-sec">
+              <i class="ph-bold ph-eye"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment History & Future Month Generator -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-sec uppercase tracking-wider">Histórico Mensal Independente</span>
+          <button id="detNextMonthBtn" class="text-xs font-bold text-violet-400 flex items-center gap-1">
+            <i class="ph-bold ph-calendar-plus"></i> + Próximo Mês
+          </button>
+        </div>
+        <div id="detHistoryContainer" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="flex items-center justify-between pt-2 border-t" style="border-color: var(--border-subtle);">
+        <button id="detDeleteBtn" class="px-3.5 py-2.5 rounded-full bg-rose-500/15 text-rose-400 text-xs font-bold flex items-center gap-1">
+          <i class="ph-bold ph-trash"></i> Excluir
+        </button>
+        <div class="flex gap-2">
+          <button id="detWhatsappBtn" class="surface-card px-4 py-2.5 rounded-full text-xs font-bold text-emerald-400 flex items-center gap-1">
+            <i class="ph-bold ph-whatsapp-logo"></i> WhatsApp
+          </button>
+          <button id="detEditBtn" class="btn-pill-cta px-5 py-2.5 text-xs">
+            Editar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 4: SWITCH ACTIVE PARTNER & EDIT PARTNER NAMES
+  ========================================================= -->
+  <div id="partnerProfileModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="surface-card w-full max-w-[440px] rounded-t-[32px] sm:rounded-[32px] p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-extrabold">Sócios Administradores</h3>
+          <p class="text-xs text-sec">Escolha quem está operando ou edite os nomes</p>
+        </div>
+        <button onclick="closePartnerProfileModal()" class="w-8 h-8 rounded-full flex items-center justify-center border" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Switch Active Operator -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" onclick="selectActiveOperator('partner1')" id="opCard1" class="p-3.5 rounded-2xl border text-left transition flex items-center justify-between" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <div>
+            <span class="text-[10px] text-sec block">Operar como</span>
+            <strong id="opModalName1" class="text-xs font-extrabold">Sócio 1</strong>
+          </div>
+          <i id="opCheck1" class="ph-fill ph-check-circle text-lg text-emerald-400"></i>
+        </button>
+
+        <button type="button" onclick="selectActiveOperator('partner2')" id="opCard2" class="p-3.5 rounded-2xl border text-left transition flex items-center justify-between" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <div>
+            <span class="text-[10px] text-sec block">Operar como</span>
+            <strong id="opModalName2" class="text-xs font-extrabold">Sócio 2</strong>
+          </div>
+          <i id="opCheck2" class="ph-fill ph-check-circle text-lg text-emerald-400 hidden"></i>
+        </button>
+      </div>
+
+      <!-- Direct Partner Name Editor -->
+      <form onsubmit="handleSavePartnerNames(event)" class="pt-3 border-t space-y-3" style="border-color: var(--border-subtle);">
+        <span class="text-xs font-bold block">Personalizar Nome dos Sócios</span>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[10px] text-sec font-semibold block mb-1">Nome do 1º Sócio</label>
+            <input type="text" id="modalInputPartner1" required class="surface-input w-full px-3 py-2.5 rounded-xl text-xs font-bold" />
+          </div>
+          <div>
+            <label class="text-[10px] text-sec font-semibold block mb-1">Nome do 2º Sócio</label>
+            <input type="text" id="modalInputPartner2" required class="surface-input w-full px-3 py-2.5 rounded-xl text-xs font-bold" />
+          </div>
+        </div>
+        <button type="submit" class="btn-pill-cta w-full py-3 text-xs">
+          Salvar Nomes dos Sócios
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 5: NOTIFICATIONS CENTER (CLEAN SYSTEM ALERTS)
+  ========================================================= -->
+  <div id="notificationsModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="surface-card w-full max-w-[460px] rounded-t-[32px] sm:rounded-[32px] p-5 max-h-[85dvh] overflow-y-auto space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-extrabold">Alertas de Vencimento</h3>
+          <p class="text-xs text-sec">Cobranças que vencem hoje ou estão em atraso</p>
+        </div>
+        <button onclick="closeNotificationsModal()" class="w-8 h-8 rounded-full flex items-center justify-center border" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
+      </div>
+
+      <div id="notifModalItems" class="space-y-2">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastArea" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-[90] w-[90%] max-w-[400px] space-y-2 pointer-events-none"></div>
+
+  <!-- ========================================================
+       APPLICATION LOGIC (INSTANT LOCAL PERSISTENCE + CLOUD SYNC)
+  ========================================================= -->
+  <script>
+    // ========================================================
+    // 1. STATE, DATES & LOCAL PERSISTENCE
+    // ========================================================
+    const STORAGE_KEY = 'duopay_v3_state';
+    const now = new Date();
+    const todayISO = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    let selectedMonth = String(now.getMonth() + 1).padStart(2, '0');
+    let selectedYear = String(now.getFullYear());
+    let dashAlertTab = 'today';
+    let paymentStatusFilter = 'all';
+    let lastReceiptData = null;
+
+    const defaultState = {
+      theme: 'dark',
+      activePartner: 'partner1',
+      systemNotificationsEnabled: false,
+      lastNotifiedSignature: '',
+      settings: {
+        serviceUrl: 'https://painel.duopay.app',
+        partner1Name: 'Sócio 1',
+        partner2Name: 'Sócio 2'
+      },
+      clients: [
+        {
+          id: 'cli_demo_1',
+          name: 'Kobe Williams',
+          whatsapp: '11998765432',
+          dueDay: now.getDate(),
+          username: 'kobe.vip',
+          encryptedPassword: '',
+          amount: 35,
+          partner: 'partner1',
+          status: 'active'
+        },
+        {
+          id: 'cli_demo_2',
+          name: 'Zackary Jones',
+          whatsapp: '11991234567',
+          dueDay: Math.max(1, now.getDate() - 2),
+          username: 'zack.pro',
+          encryptedPassword: '',
+          amount: 30,
+          partner: 'partner2',
+          status: 'active'
+        }
+      ],
+      payments: [],
+      auditLogs: []
+    };
+
+    let state = loadLocalState();
+
+    function loadLocalState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultState);
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(defaultState),
+          ...parsed,
+          settings: { ...defaultState.settings, ...(parsed.settings || {}) },
+          clients: Array.isArray(parsed.clients) ? parsed.clients : defaultState.clients,
+          payments: Array.isArray(parsed.payments) ? parsed.payments : [],
+          auditLogs: Array.isArray(parsed.auditLogs) ? parsed.auditLogs : []
+        };
+      } catch (e) {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function persistLocalState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    // ========================================================
+    // 2. AES-GCM CLIENT PASSWORD ENCRYPTION (WEB CRYPTO API)
+    // ========================================================
+    const CRYPTO_SECRET = 'DuoPay-AES256-Partner-Vault-Key!';
+    let cachedAesKey = null;
+
+    async function getAesCryptoKey() {
+      if (cachedAesKey) return cachedAesKey;
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        enc.encode(CRYPTO_SECRET),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveKey']
+      );
+      cachedAesKey = await crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: enc.encode('duopay-salt-v3'),
+          iterations: 10000,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+      return cachedAesKey;
+    }
+
+    async function encryptClientPassword(plainText) {
+      if (!plainText) return '';
+      try {
+        const key = await getAesCryptoKey();
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encoded = new TextEncoder().encode(plainText);
+        const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+        const cipherArr = Array.from(new Uint8Array(cipherBuf));
+        const ivHex = Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join('');
+        const cipherB64 = btoa(String.fromCharCode(...cipherArr));
+        return `aes:${ivHex}:${cipherB64}`;
+      } catch (e) {
+        return `b64:${btoa(unescape(encodeURIComponent(plainText)))}`;
+      }
+    }
+
+    async function decryptClientPassword(payload) {
+      if (!payload) return '123456';
+      try {
+        if (payload.startsWith('aes:')) {
+          const [, ivHex, cipherB64] = payload.split(':');
+          const iv = new Uint8Array(ivHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+          const cipherBytes = Uint8Array.from(atob(cipherB64), c => c.charCodeAt(0));
+          const key = await getAesCryptoKey();
+          const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipherBytes);
+          return new TextDecoder().decode(plainBuf);
+        }
+        if (payload.startsWith('b64:')) {
+          return decodeURIComponent(escape(atob(payload.slice(4))));
+        }
+        return payload;
+      } catch (e) {
+        return '••••••••';
+      }
+    }
+
+    // ========================================================
+    // 3. OPTIONAL REALTIME FIREBASE CLOUD SYNC (NON-BLOCKING)
+    // ========================================================
+    let db = null;
+    let cloudFns = null;
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'duopay-default';
+
+    async function initCloudSync() {
+      try {
+        if (typeof __firebase_config === 'undefined' || !__firebase_config) return;
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const [{ initializeApp }, { getAuth, signInAnonymously, signInWithCustomToken }, firestoreMod] = await Promise.all([
+          import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"),
+          import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"),
+          import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js")
+        ]);
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        db = firestoreMod.getFirestore(app);
+        cloudFns = firestoreMod;
+
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+
+        const basePath = ['artifacts', appId, 'public', 'data'];
+        firestoreMod.onSnapshot(firestoreMod.collection(db, ...basePath, 'clients'), snap => {
+          if (!snap.empty) {
+            state.clients = snap.docs.map(d => d.data());
+            persistLocalState();
+            renderAll();
+          }
+        });
+        firestoreMod.onSnapshot(firestoreMod.collection(db, ...basePath, 'payments'), snap => {
+          if (!snap.empty) {
+            state.payments = snap.docs.map(d => d.data());
+            persistLocalState();
+            renderAll();
+          }
+        });
+      } catch (e) {
+        // Runs 100% offline/locally if cloud config is absent
+      }
+    }
+
+    async function syncDocToCloud(colName, docId, dataObj) {
+      if (!db || !cloudFns) return;
+      try {
+        const ref = cloudFns.doc(db, 'artifacts', appId, 'public', 'data', colName, String(docId));
+        await cloudFns.setDoc(ref, dataObj, { merge: true });
+      } catch (e) {}
+    }
+
+    async function deleteDocFromCloud(colName, docId) {
+      if (!db || !cloudFns) return;
+      try {
+        const ref = cloudFns.doc(db, 'artifacts', appId, 'public', 'data', colName, String(docId));
+        await cloudFns.deleteDoc(ref);
+      } catch (e) {}
+    }
+
+    // ========================================================
+    // 4. HELPER UTILITIES (CURRENCY, INITIALS, DATES, AUDIO, ANIMATED NUMBERS)
+    // ========================================================
+    function fmtBRL(val) {
+      return (Number(val) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // Smooth 60fps Number Roll / Count-Up Animation for Currency & Integers
+    const activeNumAnimations = new WeakMap();
+    function animateNumberElement(el, targetValue, isCurrency = true, duration = 520) {
+      if (!el) return;
+      const target = Number(targetValue) || 0;
+      const prev = el.dataset.numVal !== undefined ? parseFloat(el.dataset.numVal) : target;
+      el.dataset.numVal = String(target);
+
+      if (Math.abs(prev - target) < 0.005) {
+        el.textContent = isCurrency ? fmtBRL(target) : String(Math.round(target));
+        return;
+      }
+
+      if (activeNumAnimations.has(el)) {
+        cancelAnimationFrame(activeNumAnimations.get(el));
+      }
+
+      const startTime = performance.now();
+      function step(nowTime) {
+        const elapsed = nowTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // EaseOutExpo for snappy fintech feel
+        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const current = prev + (target - prev) * eased;
+        el.textContent = isCurrency ? fmtBRL(current) : String(Math.round(current));
+        if (progress < 1) {
+          activeNumAnimations.set(el, requestAnimationFrame(step));
+        } else {
+          el.textContent = isCurrency ? fmtBRL(target) : String(Math.round(target));
+        }
+      }
+      activeNumAnimations.set(el, requestAnimationFrame(step));
+    }
+
+    // Spring Modal Open & Instant Close Helper
+    function openSpringModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+      modal.classList.remove('hidden', 'modal-backdrop-exit');
+      modal.classList.add('modal-backdrop-enter');
+      const card = modal.firstElementChild;
+      if (card) {
+        card.classList.remove('modal-sheet-exit');
+        card.classList.add('modal-sheet-enter');
+      }
+    }
+
+    function closeSpringModal(modalId, immediate = false) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+      if (immediate) {
+        modal.classList.add('hidden');
+        return;
+      }
+      const card = modal.firstElementChild;
+      modal.classList.remove('modal-backdrop-enter');
+      modal.classList.add('modal-backdrop-exit');
+      if (card) {
+        card.classList.remove('modal-sheet-enter');
+        card.classList.add('modal-sheet-exit');
+      }
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('modal-backdrop-exit');
+        if (card) card.classList.remove('modal-sheet-exit');
+      }, 180);
+    }
+
+    function getInitials(nameStr) {
+      const parts = (nameStr || 'Cliente').trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function getPartnerName(key) {
+      if (key === 'partner1') return state.settings.partner1Name || 'Sócio 1';
+      if (key === 'partner2') return state.settings.partner2Name || 'Sócio 2';
+      return 'Sem Sócio';
+    }
+
+    function getActiveOperatorName() {
+      return getPartnerName(state.activePartner);
+    }
+
+    function getMonthName(mStr) {
+      const map = {
+        '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março', '04': 'Abril',
+        '05': 'Maio', '06': 'Junho', '07': 'Julho', '08': 'Agosto',
+        '09': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
+      };
+      return map[mStr] || mStr;
+    }
+
+    function buildDueDate(yearStr, monthStr, dueDay) {
+      const y = parseInt(yearStr, 10);
+      const m = parseInt(monthStr, 10);
+      const maxD = new Date(y, m, 0).getDate();
+      const day = Math.min(Math.max(1, parseInt(dueDay, 10) || 10), maxD);
+      return `${yearStr}-${String(m).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
+    function fmtDateBR(iso) {
+      if (!iso) return '--/--/----';
+      const [y, m, d] = iso.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function getDynamicChargeStatus(ch) {
+      if (ch.status === 'pago') return 'pago';
+      if (ch.dueDate < todayISO) return 'atrasado';
+      return 'pendente';
+    }
+
+    function logAudit(action, details) {
+      const entry = {
+        id: `log_${Date.now()}`,
+        action,
+        details,
+        partnerName: getActiveOperatorName(),
+        timestamp: new Date().toLocaleString('pt-BR')
+      };
+      state.auditLogs.unshift(entry);
+      if (state.auditLogs.length > 60) state.auditLogs.pop();
+      persistLocalState();
+      syncDocToCloud('audit_logs', entry.id, entry);
+    }
+
+    function showToast(msg) {
+      const area = document.getElementById('toastArea');
+      const el = document.createElement('div');
+      el.className = 'surface-card px-4 py-3 rounded-full shadow-2xl border border-violet-500/40 flex items-center justify-center gap-2 text-xs font-bold modal-sheet-enter';
+      el.innerHTML = `<i class="ph-fill ph-check-circle text-emerald-400 text-base"></i><span>${msg}</span>`;
+      area.appendChild(el);
+      setTimeout(() => {
+        el.classList.remove('modal-sheet-enter');
+        el.classList.add('modal-sheet-exit');
+        setTimeout(() => el.remove(), 200);
+      }, 2400);
+    }
+
+    function playNotificationChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.18); // A5
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.36);
+      } catch (e) {}
+    }
+
+    // ========================================================
+    // 5. THEME ENGINE (ESCURO, AMOLED, CLARO)
+    // ========================================================
+    window.applyTheme = function(themeName) {
+      state.theme = themeName;
+      document.documentElement.setAttribute('data-theme', themeName);
+      const metaTheme = document.getElementById('metaThemeColor');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', themeName === 'amoled' ? '#000000' : themeName === 'light' ? '#f3f4f8' : '#0d0d12');
+      }
+
+      const icon = document.getElementById('themeCycleIcon');
+      if (icon) {
+        icon.className = themeName === 'amoled'
+          ? 'ph-fill ph-sparkle text-base text-violet-400'
+          : themeName === 'light'
+          ? 'ph-bold ph-sun text-base text-amber-500'
+          : 'ph-bold ph-moon-stars text-base text-violet-300';
+      }
+
+      ['dark', 'amoled', 'light'].forEach(t => {
+        const btn = document.getElementById(`themeBtn-${t}`);
+        if (btn) {
+          btn.classList.toggle('active', t === themeName);
+        }
+      });
+
+      persistLocalState();
+    };
+
+    window.cycleTheme = function() {
+      const order = ['dark', 'amoled', 'light'];
+      const next = order[(order.indexOf(state.theme) + 1) % order.length];
+      applyTheme(next);
+      const labels = { dark: 'Tema Escuro', amoled: 'Tema AMOLED Puro', light: 'Tema Claro' };
+      showToast(labels[next]);
+    };
+
+    // ========================================================
+    // 6. EDITABLE PARTNER NAMES & OPERATOR SWITCHER
+    // ========================================================
+    window.openPartnerProfileModal = function() {
+      document.getElementById('modalInputPartner1').value = state.settings.partner1Name || 'Sócio 1';
+      document.getElementById('modalInputPartner2').value = state.settings.partner2Name || 'Sócio 2';
+      document.getElementById('opModalName1').textContent = state.settings.partner1Name || 'Sócio 1';
+      document.getElementById('opModalName2').textContent = state.settings.partner2Name || 'Sócio 2';
+      document.getElementById('opCheck1').classList.toggle('hidden', state.activePartner !== 'partner1');
+      document.getElementById('opCheck2').classList.toggle('hidden', state.activePartner !== 'partner2');
+      openSpringModal('partnerProfileModal');
+    };
+
+    window.openPartnerNamesModal = function() {
+      openPartnerProfileModal();
+      setTimeout(() => document.getElementById('modalInputPartner1').focus(), 80);
+    };
+
+    window.closePartnerProfileModal = function() {
+      closeSpringModal('partnerProfileModal');
+    };
+
+    window.selectActiveOperator = function(partnerKey) {
+      state.activePartner = partnerKey;
+      persistLocalState();
+      renderAll();
+      closePartnerProfileModal();
+      showToast(`Operando como ${getActiveOperatorName()}`);
+    };
+
+    window.handleSavePartnerNames = function(e) {
+      e.preventDefault();
+      const p1 = document.getElementById('modalInputPartner1').value.trim() || 'Sócio 1';
+      const p2 = document.getElementById('modalInputPartner2').value.trim() || 'Sócio 2';
+
+      state.settings.partner1Name = p1;
+      state.settings.partner2Name = p2;
+      persistLocalState();
+
+      // Close modal immediately before cloud sync
+      closePartnerProfileModal();
+      renderAll();
+      logAudit('Sócios Renomeados', `Nomes definidos como ${p1} e ${p2}`);
+      syncDocToCloud('settings', 'global', state.settings);
+      showToast(`Sócios atualizados: ${p1} & ${p2}`);
+    };
+
+    // ========================================================
+    // 7. CLIENT CRUD (WITH GUARANTEED INSTANT MODAL CLOSING)
+    // ========================================================
+    window.pickPlanValue = function(val) {
+      ['30', '35', 'Custom'].forEach(k => {
+        const b = document.getElementById(`planBtn${k}`);
+        if (b) b.classList.remove('active');
+      });
+      const customBox = document.getElementById('customPriceBox');
+      const amtInput = document.getElementById('fieldClientAmount');
+
+      if (val === 30) {
+        document.getElementById('planBtn30').classList.add('active');
+        customBox.classList.add('hidden');
+        amtInput.value = '30.00';
+      } else if (val === 35) {
+        document.getElementById('planBtn35').classList.add('active');
+        customBox.classList.add('hidden');
+        amtInput.value = '35.00';
+      } else {
+        document.getElementById('planBtnCustom').classList.add('active');
+        customBox.classList.remove('hidden');
+        amtInput.focus();
+      }
+    };
+
+    window.toggleClientPassInput = function() {
+      const inp = document.getElementById('fieldClientPass');
+      const icon = document.getElementById('fieldPassEye');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'ph-bold ph-eye-slash text-xs text-violet-400';
+      } else {
+        inp.type = 'password';
+        icon.className = 'ph-bold ph-eye text-xs';
+      }
+    };
+
+    window.openClientModal = async function(clientId = null) {
+      const form = document.getElementById('clientForm');
+      form.reset();
+      document.getElementById('fieldClientPass').type = 'password';
+
+      if (clientId) {
+        const client = state.clients.find(c => c.id === clientId);
+        if (!client) return;
+        document.getElementById('clientModalHeading').textContent = 'Editar Cliente';
+        document.getElementById('fieldClientId').value = client.id;
+        document.getElementById('fieldClientName').value = client.name || '';
+        document.getElementById('fieldClientWhatsapp').value = client.whatsapp || '';
+        document.getElementById('fieldClientDueDay').value = client.dueDay || 10;
+        document.getElementById('fieldClientUser').value = client.username || '';
+        document.getElementById('fieldClientPass').value = await decryptClientPassword(client.encryptedPassword);
+
+        const amt = Number(client.amount) || 30;
+        document.getElementById('fieldClientAmount').value = amt.toFixed(2);
+        if (amt === 30) pickPlanValue(30);
+        else if (amt === 35) pickPlanValue(35);
+        else pickPlanValue('custom');
+
+        document.getElementById('fieldClientPartner').value = client.partner || 'partner1';
+        document.getElementById('fieldClientStatus').value = client.status || 'active';
+      } else {
+        document.getElementById('clientModalHeading').textContent = 'Novo Cliente';
+        document.getElementById('fieldClientId').value = '';
+        document.getElementById('fieldClientDueDay').value = now.getDate();
+        document.getElementById('fieldClientPartner').value = state.activePartner;
+        document.getElementById('fieldClientStatus').value = 'active';
+        pickPlanValue(30);
+      }
+
+      openSpringModal('clientModal');
+    };
+
+    window.closeClientModal = function() {
+      closeSpringModal('clientModal', true);
+    };
+
+    // CRITICAL FIX: Synchronous state update + immediate modal close
+    window.handleSaveClient = async function(e) {
+      e.preventDefault();
+
+      const existingId = document.getElementById('fieldClientId').value.trim();
+      const name = document.getElementById('fieldClientName').value.trim();
+      const whatsapp = document.getElementById('fieldClientWhatsapp').value.replace(/\D/g, '');
+      const dueDay = Math.min(31, Math.max(1, parseInt(document.getElementById('fieldClientDueDay').value, 10) || 10));
+      const username = document.getElementById('fieldClientUser').value.trim();
+      const plainPassword = document.getElementById('fieldClientPass').value;
+      const amount = parseFloat(document.getElementById('fieldClientAmount').value) || 30;
+      const partner = document.getElementById('fieldClientPartner').value;
+      const status = document.getElementById('fieldClientStatus').value;
+
+      // Close modal immediately so the user never gets stuck on mobile
+      closeClientModal();
+
+      const encryptedPassword = await encryptClientPassword(plainPassword);
+      const clientId = existingId || `cli_${Date.now()}`;
+
+      const clientObj = {
+        id: clientId,
+        name,
+        whatsapp,
+        dueDay,
+        username,
+        encryptedPassword,
+        amount,
+        partner,
+        status,
+        updatedAt: new Date().toISOString(),
+        updatedBy: getActiveOperatorName()
+      };
+
+      const idx = state.clients.findIndex(c => c.id === clientId);
+      if (idx >= 0) {
+        state.clients[idx] = { ...state.clients[idx], ...clientObj };
+      } else {
+        state.clients.push(clientObj);
+      }
+
+      // Update or create current competence charge
+      const comp = `${selectedYear}-${selectedMonth}`;
+      const payId = `${clientId}_${comp}`;
+      const dueDate = buildDueDate(selectedYear, selectedMonth, dueDay);
+      const existingPayIdx = state.payments.findIndex(p => p.id === payId);
+
+      if (status === 'active') {
+        if (existingPayIdx === -1) {
+          const newPay = {
+            id: payId,
+            clientId,
+            clientName: name,
+            clientWhatsapp: whatsapp,
+            competence: comp,
+            month: selectedMonth,
+            year: selectedYear,
+            amount,
+            dueDate,
+            partner: partner === 'unassigned' ? state.activePartner : partner,
+            status: dueDate < todayISO ? 'atrasado' : 'pendente',
+            paidAt: null,
+            confirmedByPartnerName: null
+          };
+          state.payments.push(newPay);
+          syncDocToCloud('payments', payId, newPay);
+        } else if (state.payments[existingPayIdx].status !== 'pago') {
+          state.payments[existingPayIdx] = {
+            ...state.payments[existingPayIdx],
+            clientName: name,
+            clientWhatsapp: whatsapp,
+            amount,
+            dueDate,
+            partner: partner === 'unassigned' ? state.payments[existingPayIdx].partner : partner,
+            status: dueDate < todayISO ? 'atrasado' : 'pendente'
+          };
+          syncDocToCloud('payments', payId, state.payments[existingPayIdx]);
+        }
+      }
+
+      persistLocalState();
+      renderAll();
+      syncDocToCloud('clients', clientId, clientObj);
+      logAudit(existingId ? 'Cliente Editado' : 'Cliente Adicionado', `${name} (${fmtBRL(amount)} • Dia ${dueDay})`);
+      showToast(existingId ? 'Cliente atualizado com sucesso!' : 'Cliente salvo com sucesso!');
+    };
+
+    // ========================================================
+    // 8. RECURRING MONTHLY CHARGES & RECEIPT MODAL
+    // ========================================================
+    function ensureCompetenceCharges(showMessage = false) {
+      const comp = `${selectedYear}-${selectedMonth}`;
+      const activeClients = state.clients.filter(c => c.status === 'active');
+      let added = 0;
+
+      activeClients.forEach(c => {
+        const payId = `${c.id}_${comp}`;
+        if (!state.payments.some(p => p.id === payId)) {
+          const dueDate = buildDueDate(selectedYear, selectedMonth, c.dueDay);
+          const charge = {
+            id: payId,
+            clientId: c.id,
+            clientName: c.name,
+            clientWhatsapp: c.whatsapp || '',
+            competence: comp,
+            month: selectedMonth,
+            year: selectedYear,
+            amount: Number(c.amount) || 30,
+            dueDate,
+            partner: (!c.partner || c.partner === 'unassigned') ? 'partner1' : c.partner,
+            status: dueDate < todayISO ? 'atrasado' : 'pendente',
+            paidAt: null,
+            confirmedByPartnerName: null
+          };
+          state.payments.push(charge);
+          syncDocToCloud('payments', payId, charge);
+          added++;
+        }
+      });
+
+      if (added > 0) persistLocalState();
+      if (showMessage) {
+        showToast(added > 0 ? `${added} cobrança(s) gerada(s) em ${selectedMonth}/${selectedYear}` : `Mês ${selectedMonth}/${selectedYear} sincronizado!`);
+      }
+    }
+
+    window.generateChargesForCurrentCompetence = function(manual) {
+      ensureCompetenceCharges(manual);
+      renderAll();
+    };
+
+    window.confirmMonthlyPayment = function(payId) {
+      const idx = state.payments.findIndex(p => p.id === payId);
+      if (idx === -1) return;
+
+      const nowStr = new Date().toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      const txCode = '#' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+      state.payments[idx].status = 'pago';
+      state.payments[idx].paidAt = nowStr;
+      state.payments[idx].confirmedByPartnerName = getActiveOperatorName();
+      state.payments[idx].txId = txCode;
+
+      persistLocalState();
+      syncDocToCloud('payments', payId, state.payments[idx]);
+      logAudit('Pagamento Recebido', `${state.payments[idx].clientName} (${state.payments[idx].month}/${state.payments[idx].year}) - ${fmtBRL(state.payments[idx].amount)}`);
+      renderAll();
+
+      // Show sleek Payment Receipt Modal inspired by the middle phone in reference image
+      const ch = state.payments[idx];
+      lastReceiptData = ch;
+      document.getElementById('recClientName').textContent = ch.clientName;
+      document.getElementById('recAmount').textContent = fmtBRL(ch.amount);
+      document.getElementById('recCompetence').textContent = `${getMonthName(ch.month)} / ${ch.year}`;
+      document.getElementById('recPartner').textContent = getPartnerName(ch.partner);
+      document.getElementById('recConfirmedBy').textContent = ch.confirmedByPartnerName;
+      document.getElementById('recDateTime').textContent = ch.paidAt;
+      document.getElementById('recTxId').textContent = ch.txId || '#DP-92KD';
+
+      // Re-trigger SVG checkmark stroke draw & ticket spring unfold
+      const badge = document.getElementById('receiptCheckBadge');
+      const ticket = document.getElementById('receiptTicketBox');
+      if (badge) {
+        badge.classList.remove('receipt-check-badge');
+        void badge.offsetWidth;
+        badge.classList.add('receipt-check-badge');
+      }
+      if (ticket) {
+        ticket.classList.remove('receipt-ticket-anim');
+        void ticket.offsetWidth;
+        ticket.classList.add('receipt-ticket-anim');
+      }
+
+      playNotificationChime();
+      openSpringModal('receiptModal');
+    };
+
+    window.closeReceiptModal = function() {
+      closeSpringModal('receiptModal');
+    };
+
+    window.shareReceiptText = function() {
+      if (!lastReceiptData) return;
+      const text = `✅ *COMPROVANTE DE PAGAMENTO — DUOPAY*\n👤 Cliente: ${lastReceiptData.clientName}\n💰 Valor: ${fmtBRL(lastReceiptData.amount)}\n📅 Referência: ${lastReceiptData.month}/${lastReceiptData.year}\n🤝 Confirmado por: ${lastReceiptData.confirmedByPartnerName}\n🕒 Data: ${lastReceiptData.paidAt}\n🔖 ID: ${lastReceiptData.txId || '#DP-OK'}`;
+      copyToClipboard(text, 'Comprovante copiado!');
+    };
+
+    window.undoMonthlyPayment = function(payId) {
+      const idx = state.payments.findIndex(p => p.id === payId);
+      if (idx === -1) return;
+      const ch = state.payments[idx];
+      ch.status = ch.dueDate < todayISO ? 'atrasado' : 'pendente';
+      ch.paidAt = null;
+      ch.confirmedByPartnerName = null;
+      persistLocalState();
+      syncDocToCloud('payments', payId, ch);
+      logAudit('Pagamento Reaberto', `${ch.clientName} (${ch.month}/${ch.year})`);
+      renderAll();
+      showToast('Pagamento reaberto como pendente.');
+    };
+
+    // ========================================================
+    // 9. CLIENT DETAILS & INDEPENDENT NEXT MONTH GENERATOR
+    // ========================================================
+    window.openClientDetailModal = async function(clientId) {
+      const client = state.clients.find(c => c.id === clientId);
+      if (!client) return;
+
+      document.getElementById('detAvatar').textContent = getInitials(client.name);
+      document.getElementById('detName').textContent = client.name;
+      document.getElementById('detSub').textContent = `${fmtBRL(client.amount)}/mês • Vence dia ${client.dueDay} • ${getPartnerName(client.partner)}`;
+      document.getElementById('detUser').textContent = client.username || '---';
+      document.getElementById('detPass').textContent = '••••••••';
+
+      const plainPass = await decryptClientPassword(client.encryptedPassword);
+      let showPass = false;
+      document.getElementById('detTogglePassBtn').onclick = () => {
+        showPass = !showPass;
+        document.getElementById('detPass').textContent = showPass ? plainPass : '••••••••';
+      };
+
+      document.getElementById('detCopyKitBtn').onclick = () => {
+        const msg = `🔑 *DADOS DE ACESSO*\n👤 Cliente: ${client.name}\n🌐 Link: ${state.settings.serviceUrl}\n👤 Usuário: ${client.username}\n🔒 Senha: ${plainPass}\n📅 Vencimento: Dia ${client.dueDay} (${fmtBRL(client.amount)})`;
+        copyToClipboard(msg, 'Credenciais + Link copiados!');
+      };
+
+      document.getElementById('detNextMonthBtn').onclick = () => {
+        createFutureMonthForClient(client.id);
+      };
+
+      document.getElementById('detEditBtn').onclick = () => {
+        closeClientDetailModal();
+        openClientModal(client.id);
+      };
+
+      document.getElementById('detWhatsappBtn').onclick = () => {
+        const cleanPhone = (client.whatsapp || '').replace(/\D/g, '');
+        if (cleanPhone) window.open(`https://wa.me/55${cleanPhone}`, '_blank');
+      };
+
+      document.getElementById('detDeleteBtn').onclick = () => {
+        deleteClientById(client.id);
+      };
+
+      renderClientDetailHistory(client.id);
+      openSpringModal('clientDetailModal');
+    };
+
+    function renderClientDetailHistory(clientId) {
+      const list = state.payments
+        .filter(p => p.clientId === clientId)
+        .sort((a, b) => b.competence.localeCompare(a.competence));
+
+      const box = document.getElementById('detHistoryContainer');
+      if (list.length === 0) {
+        box.innerHTML = `<p class="text-xs text-sec text-center py-3">Nenhuma cobrança gerada.</p>`;
+        return;
+      }
+
+      box.innerHTML = list.map(ch => {
+        const st = getDynamicChargeStatus(ch);
+        const badge = st === 'pago'
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400">PAGO</span>`
+          : st === 'atrasado'
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400">ATRASADO</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400">PENDENTE</span>`;
+
+        const btn = st === 'pago'
+          ? `<button onclick="undoMonthlyPayment('${ch.id}'); openClientDetailModal('${clientId}')" class="px-3 py-1 rounded-full text-[11px] font-semibold border" style="border-color: var(--border-subtle);">Reabrir</button>`
+          : `<button onclick="closeClientDetailModal(); confirmMonthlyPayment('${ch.id}')" class="btn-pill-cta px-3 py-1 text-[11px]">Receber</button>`;
+
+        return `
+          <div class="p-3 rounded-2xl border flex items-center justify-between" style="background: var(--bg-input); border-color: var(--border-subtle);">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <strong class="text-xs font-bold font-mono-num">${ch.month}/${ch.year}</strong>
+                ${badge}
+                <span class="text-xs font-bold font-mono-num">${fmtBRL(ch.amount)}</span>
+              </div>
+              <span class="text-[10px] text-sec block mt-0.5">
+                Venc: ${fmtDateBR(ch.dueDate)} ${ch.paidAt ? `• Pago em ${ch.paidAt}` : ''}
+              </span>
+            </div>
+            ${btn}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function createFutureMonthForClient(clientId) {
+      const client = state.clients.find(c => c.id === clientId);
+      if (!client) return;
+
+      const existing = state.payments
+        .filter(p => p.clientId === clientId)
+        .sort((a, b) => b.competence.localeCompare(a.competence));
+
+      let y = parseInt(selectedYear, 10);
+      let m = parseInt(selectedMonth, 10);
+      if (existing.length > 0) {
+        const [ly, lm] = existing[0].competence.split('-').map(Number);
+        y = ly;
+        m = lm;
+      }
+      m += 1;
+      if (m > 12) { m = 1; y += 1; }
+
+      const nextM = String(m).padStart(2, '0');
+      const nextY = String(y);
+      const comp = `${nextY}-${nextM}`;
+      const payId = `${client.id}_${comp}`;
+      const dueDate = buildDueDate(nextY, nextM, client.dueDay);
+
+      const newCharge = {
+        id: payId,
+        clientId: client.id,
+        clientName: client.name,
+        clientWhatsapp: client.whatsapp || '',
+        competence: comp,
+        month: nextM,
+        year: nextY,
+        amount: Number(client.amount) || 30,
+        dueDate,
+        partner: (!client.partner || client.partner === 'unassigned') ? 'partner1' : client.partner,
+        status: dueDate < todayISO ? 'atrasado' : 'pendente',
+        paidAt: null,
+        confirmedByPartnerName: null
+      };
+
+      state.payments.push(newCharge);
+      persistLocalState();
+      syncDocToCloud('payments', payId, newCharge);
+      renderClientDetailHistory(clientId);
+      renderAll();
+      showToast(`Mês ${nextM}/${nextY} gerado como PENDENTE!`);
+    }
+
+    window.closeClientDetailModal = function() {
+      closeSpringModal('clientDetailModal');
+    };
+
+    function deleteClientById(clientId) {
+      const client = state.clients.find(c => c.id === clientId);
+      if (!client) return;
+      state.clients = state.clients.filter(c => c.id !== clientId);
+      // Remove only unpaid charges so historical paid revenue stays intact
+      const toRemove = state.payments.filter(p => p.clientId === clientId && p.status !== 'pago');
+      state.payments = state.payments.filter(p => !(p.clientId === clientId && p.status !== 'pago'));
+
+      persistLocalState();
+      deleteDocFromCloud('clients', clientId);
+      toRemove.forEach(rem => deleteDocFromCloud('payments', rem.id));
+      closeClientDetailModal();
+      logAudit('Cliente Excluído', client.name);
+      renderAll();
+      showToast(`Cliente ${client.name} removido.`);
+    }
+
+    // ========================================================
+    // 10. PARTNER EQUILIBRIUM & ASSIGNMENT
+    // ========================================================
+    window.assignPartnerDirect = function(clientId, partnerKey) {
+      const client = state.clients.find(c => c.id === clientId);
+      if (!client) return;
+      client.partner = partnerKey;
+
+      const comp = `${selectedYear}-${selectedMonth}`;
+      const pay = state.payments.find(p => p.id === `${clientId}_${comp}`);
+      if (pay && pay.status !== 'pago') {
+        pay.partner = partnerKey;
+        syncDocToCloud('payments', pay.id, pay);
+      }
+
+      persistLocalState();
+      syncDocToCloud('clients', clientId, client);
+      renderAll();
+      showToast(`${client.name} → ${getPartnerName(partnerKey)}`);
+    };
+
+    window.runBalancedDistribution = function() {
+      const active = state.clients.filter(c => c.status === 'active');
+      const unassigned = active.filter(c => !c.partner || c.partner === 'unassigned');
+
+      if (unassigned.length === 0) {
+        showToast('Todos os clientes ativos já têm sócio definido!');
+        return;
+      }
+
+      let p1Count = active.filter(c => c.partner === 'partner1').length;
+      let p2Count = active.filter(c => c.partner === 'partner2').length;
+
+      unassigned.forEach(c => {
+        const target = p1Count <= p2Count ? 'partner1' : 'partner2';
+        c.partner = target;
+        if (target === 'partner1') p1Count++;
+        else p2Count++;
+        syncDocToCloud('clients', c.id, c);
+
+        const comp = `${selectedYear}-${selectedMonth}`;
+        const pay = state.payments.find(p => p.id === `${c.id}_${comp}`);
+        if (pay && pay.status !== 'pago') {
+          pay.partner = target;
+          syncDocToCloud('payments', pay.id, pay);
+        }
+      });
+
+      persistLocalState();
+      logAudit('Divisão Equilibrada', `${unassigned.length} cliente(s) distribuído(s)`);
+      renderAll();
+      showToast(`${unassigned.length} cliente(s) equilibrados entre ${getPartnerName('partner1')} e ${getPartnerName('partner2')}!`);
+    };
+
+    // ========================================================
+    // 11. REAL ANDROID SYSTEM NOTIFICATIONS (CAPACITOR NATIVE + SERVICE WORKER)
+    // ========================================================
+    let swRegistration = null;
+
+    async function initAndroidServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      try {
+        const swCode = `
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+          self.addEventListener('notificationclick', (event) => {
+            event.notification.close();
+            event.waitUntil(
+              self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+                if (clientList.length > 0) return clientList[0].focus();
+                return self.clients.openWindow('/');
+              })
+            );
+          });
+        `;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        swRegistration = await navigator.serviceWorker.register(swUrl);
+      } catch (e) {
+        try {
+          swRegistration = await navigator.serviceWorker.ready;
+        } catch (_) {}
+      }
+    }
+
+    function getCapacitorLocalNotifications() {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+        return window.Capacitor.Plugins.LocalNotifications;
+      }
+      return null;
+    }
+
+    function updateAndroidNotifToggleUI() {
+      const btn = document.getElementById('androidNotifToggleBtn');
+      const knob = document.getElementById('androidNotifToggleKnob');
+      const sub = document.getElementById('androidNotifStatusSub');
+      if (!btn || !knob || !sub) return;
+
+      const hasNativeCap = !!getCapacitorLocalNotifications();
+      const browserGranted = ('Notification' in window) && Notification.permission === 'granted';
+      const isEnabled = state.systemNotificationsEnabled && (hasNativeCap || browserGranted);
+
+      if (isEnabled) {
+        btn.className = 'w-12 h-7 rounded-full p-1 transition-colors duration-200 flex items-center bg-violet-600 shrink-0';
+        knob.className = 'w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-200 translate-x-5';
+        sub.textContent = hasNativeCap
+          ? 'Ativo via Android Nativo (Capacitor LocalNotifications)'
+          : 'Ativo na barra de status do Android';
+      } else {
+        btn.className = 'w-12 h-7 rounded-full p-1 transition-colors duration-200 flex items-center bg-white/10 shrink-0';
+        knob.className = 'w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-200 translate-x-0';
+        sub.textContent = 'Alertas na barra de status para vencimentos do dia e atrasos';
+      }
+    }
+
+    window.toggleAndroidSystemNotifications = async function() {
+      const capNotif = getCapacitorLocalNotifications();
+
+      if (state.systemNotificationsEnabled) {
+        state.systemNotificationsEnabled = false;
+        persistLocalState();
+        updateAndroidNotifToggleUI();
+        showToast('Notificações do sistema desativadas.');
+        return;
+      }
+
+      // 1. Check Native APK (Capacitor LocalNotifications)
+      if (capNotif) {
+        try {
+          const perm = await capNotif.requestPermissions();
+          if (perm.display === 'granted') {
+            state.systemNotificationsEnabled = true;
+            state.lastNotifiedSignature = '';
+            persistLocalState();
+            updateAndroidNotifToggleUI();
+            await syncAndroidSystemNotifications(true);
+            showToast('Notificações nativas do Android ativadas!');
+            return;
+          }
+        } catch (e) {}
+      }
+
+      // 2. Check Android WebAPK / Chrome Notification API
+      if ('Notification' in window) {
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            state.systemNotificationsEnabled = true;
+            state.lastNotifiedSignature = '';
+            persistLocalState();
+            updateAndroidNotifToggleUI();
+            await syncAndroidSystemNotifications(true);
+            showToast('Notificações do sistema Android ativadas!');
+          } else {
+            state.systemNotificationsEnabled = false;
+            persistLocalState();
+            updateAndroidNotifToggleUI();
+            showToast('Permissão de notificação negada no Android.');
+          }
+        } catch (e) {
+          showToast('Permita notificações nas configurações do navegador/Android.');
+        }
+      } else {
+        showToast('API de notificações indisponível neste ambiente.');
+      }
+    };
+
+    async function dispatchSystemNotification(title, body, tagId) {
+      const capNotif = getCapacitorLocalNotifications();
+
+      // Priority 1: Native Android APK via Capacitor LocalNotifications
+      if (capNotif) {
+        try {
+          const nowId = Math.floor(Math.random() * 900000) + 1000;
+          await capNotif.schedule({
+            notifications: [
+              {
+                id: nowId,
+                title,
+                body,
+                schedule: { at: new Date(Date.now() + 800) },
+                smallIcon: 'ic_stat_icon_config_sample',
+                iconColor: '#7C3AED'
+              },
+              {
+                id: 88001,
+                title: 'DuoPay • Verificação Diária de Assinaturas',
+                body,
+                schedule: { on: { hour: 9, minute: 0 }, allowWhileIdle: true }
+              }
+            ]
+          });
+          return;
+        } catch (e) {}
+      }
+
+      // Priority 2: Android ServiceWorker showNotification (System Status Bar with Vibration)
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const options = {
+          body,
+          tag: tagId || 'duopay-billing-alert',
+          renotify: true,
+          vibrate: [200, 100, 200],
+          data: { date: todayISO, url: window.location.href }
+        };
+
+        try {
+          if (swRegistration && typeof swRegistration.showNotification === 'function') {
+            await swRegistration.showNotification(title, options);
+            return;
+          }
+          if (navigator.serviceWorker) {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg && typeof reg.showNotification === 'function') {
+              await reg.showNotification(title, options);
+              return;
+            }
+          }
+        } catch (e) {}
+
+        try {
+          new Notification(title, options);
+        } catch (e) {}
+      }
+    }
+
+    async function syncAndroidSystemNotifications(forceDispatch = false) {
+      if (!state.systemNotificationsEnabled) return;
+
+      const comp = `${selectedYear}-${selectedMonth}`;
+      const dueToday = state.payments.filter(p => getDynamicChargeStatus(p) !== 'pago' && p.dueDate === todayISO);
+      const overdue = state.payments.filter(p => p.competence === comp && getDynamicChargeStatus(p) === 'atrasado');
+
+      if (dueToday.length === 0 && overdue.length === 0) return;
+
+      const signature = `${todayISO}_T:${dueToday.map(d => d.id).join(',')}_O:${overdue.map(o => o.id).join(',')}`;
+      if (!forceDispatch && state.lastNotifiedSignature === signature) return;
+
+      state.lastNotifiedSignature = signature;
+      persistLocalState();
+
+      const parts = [];
+      if (dueToday.length > 0) {
+        const sumToday = dueToday.reduce((acc, c) => acc + (Number(c.amount) || 0), 0);
+        parts.push(`${dueToday.length} vencendo hoje (${fmtBRL(sumToday)})`);
+      }
+      if (overdue.length > 0) {
+        const sumOver = overdue.reduce((acc, c) => acc + (Number(c.amount) || 0), 0);
+        parts.push(`${overdue.length} em atraso (${fmtBRL(sumOver)})`);
+      }
+
+      const namesPreview = [...dueToday, ...overdue].slice(0, 3).map(c => c.clientName).join(', ');
+      const title = `DuoPay • ${parts.join(' e ')}`;
+      const body = `Clientes: ${namesPreview}${dueToday.length + overdue.length > 3 ? '...' : ''}. Toque para gerenciar.`;
+
+      await dispatchSystemNotification(title, body, `duopay-${todayISO}`);
+    }
+
+    window.openNotificationsModal = function() {
+      renderNotificationsCenter();
+      openSpringModal('notificationsModal');
+    };
+
+    window.closeNotificationsModal = function() {
+      closeSpringModal('notificationsModal');
+    };
+
+    function renderNotificationsCenter() {
+      const comp = `${selectedYear}-${selectedMonth}`;
+      const dueToday = state.payments.filter(p => getDynamicChargeStatus(p) !== 'pago' && p.dueDate === todayISO);
+      const overdue = state.payments.filter(p => p.competence === comp && getDynamicChargeStatus(p) === 'atrasado');
+      const total = dueToday.length + overdue.length;
+
+      const badge = document.getElementById('headerNotifBadge');
+      if (total > 0) {
+        badge.textContent = total;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      const box = document.getElementById('notifModalItems');
+      if (total === 0) {
+        box.innerHTML = `<div class="p-6 text-center text-xs text-sec">Nenhum vencimento pendente hoje ou atrasado no mês.</div>`;
+        return;
+      }
+
+      box.innerHTML = [
+        ...dueToday.map(ch => `
+          <div class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-bold text-amber-400 uppercase block">Vence Hoje • ${getPartnerName(ch.partner)}</span>
+              <strong class="text-xs font-bold">${ch.clientName} (${fmtBRL(ch.amount)})</strong>
+            </div>
+            <button onclick="closeNotificationsModal(); confirmMonthlyPayment('${ch.id}')" class="btn-pill-cta px-3 py-1.5 text-[11px]">Receber</button>
+          </div>
+        `),
+        ...overdue.map(ch => `
+          <div class="p-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 flex items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-bold text-rose-400 uppercase block">Atrasado (${fmtDateBR(ch.dueDate)}) • ${getPartnerName(ch.partner)}</span>
+              <strong class="text-xs font-bold">${ch.clientName} (${fmtBRL(ch.amount)})</strong>
+            </div>
+            <button onclick="closeNotificationsModal(); confirmMonthlyPayment('${ch.id}')" class="btn-pill-cta px-3 py-1.5 text-[11px]">Receber</button>
+          </div>
+        `)
+      ].join('');
+    }
+
+    // ========================================================
+    // 12. RENDER ALL SCREENS
+    // ========================================================
+    function renderAll() {
+      const p1Name = getPartnerName('partner1');
+      const p2Name = getPartnerName('partner2');
+
+      // Update Header Partner Display
+      document.getElementById('headerPartnerInitials').textContent = getInitials(getActiveOperatorName());
+      document.getElementById('headerActivePartnerName').textContent = getActiveOperatorName();
+      document.getElementById('headerCompetenceText').textContent = `${getMonthName(selectedMonth).slice(0, 3)} ${selectedYear}`;
+
+      // Update all partner select options across tabs/modals
+      ['optClientPartner1', 'optPayPartner1', 'modalOptPartner1'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = p1Name;
+      });
+      ['optClientPartner2', 'optPayPartner2', 'modalOptPartner2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = p2Name;
+      });
+
+      // Settings form sync
+      document.getElementById('cfgServiceUrl').value = state.settings.serviceUrl || '';
+      document.getElementById('cfgPartner1Name').value = p1Name;
+      document.getElementById('cfgPartner2Name').value = p2Name;
+
+      updateAndroidNotifToggleUI();
+      renderDashboardView();
+      renderClientsList();
+      renderPaymentsList();
+      renderPartnersView();
+      renderNotificationsCenter();
+      renderAuditList();
+      syncAndroidSystemNotifications(false);
+    }
+
+    function renderDashboardView() {
+      const comp = `${selectedYear}-${selectedMonth}`;
+      const activeClients = state.clients.filter(c => c.status === 'active');
+      const monthCharges = state.payments.filter(p => p.competence === comp);
+
+      let expected = 0, received = 0, pending = 0, paidCount = 0, openCount = 0, overdueCount = 0;
+      let p1Exp = 0, p1Rec = 0, p2Exp = 0, p2Rec = 0;
+
+      monthCharges.forEach(ch => {
+        const amt = Number(ch.amount) || 0;
+        const st = getDynamicChargeStatus(ch);
+        expected += amt;
+
+        if (ch.partner === 'partner2') {
+          p2Exp += amt;
+          if (st === 'pago') p2Rec += amt;
+        } else {
+          p1Exp += amt;
+          if (st === 'pago') p1Rec += amt;
+        }
+
+        if (st === 'pago') {
+          received += amt;
+          paidCount++;
+        } else {
+          pending += amt;
+          if (st === 'atrasado') overdueCount++;
+          else openCount++;
+        }
+      });
+
+      const pct = expected > 0 ? Math.round((received / expected) * 100) : 0;
+      const dueTodayList = state.payments.filter(p => getDynamicChargeStatus(p) !== 'pago' && p.dueDate === todayISO);
+      const overdueList = monthCharges.filter(p => getDynamicChargeStatus(p) === 'atrasado');
+
+      document.getElementById('heroMonthLabel').textContent = `${getMonthName(selectedMonth).toUpperCase()} ${selectedYear}`;
+      animateNumberElement(document.getElementById('dashExpectedTotal'), expected, true);
+      document.getElementById('dashPaidRatioText').textContent = `RECEBIDO: ${fmtBRL(received)}`;
+      document.getElementById('dashPaidPercentBadge').textContent = `${pct}%`;
+      document.getElementById('dashProgressBar').style.width = `${pct}%`;
+
+      document.getElementById('heroP1Label').textContent = getPartnerName('partner1');
+      animateNumberElement(document.getElementById('heroP1Value'), p1Rec, true);
+      document.getElementById('heroP2Label').textContent = getPartnerName('partner2');
+      animateNumberElement(document.getElementById('heroP2Value'), p2Rec, true);
+      animateNumberElement(document.getElementById('dashActiveClientsCount'), activeClients.length, false);
+
+      animateNumberElement(document.getElementById('kpiReceived'), received, true);
+      document.getElementById('kpiReceivedSub').textContent = `${paidCount} pago(s)`;
+      animateNumberElement(document.getElementById('kpiPending'), pending, true);
+      document.getElementById('kpiPendingSub').textContent = `${openCount} a vencer`;
+      animateNumberElement(document.getElementById('kpiOverdueCount'), overdueCount, false);
+      document.getElementById('kpiDueTodaySub').textContent = `${dueTodayList.length} vencem hoje`;
+
+      // Partner cards on Dashboard
+      const p1CliCount = activeClients.filter(c => c.partner === 'partner1').length;
+      const p2CliCount = activeClients.filter(c => c.partner === 'partner2').length;
+      document.getElementById('dashCardP1Name').textContent = getPartnerName('partner1');
+      document.getElementById('dashCardP1Clients').textContent = `${p1CliCount} cli`;
+      animateNumberElement(document.getElementById('dashCardP1Received'), p1Rec, true);
+      document.getElementById('dashCardP1Expected').textContent = fmtBRL(p1Exp);
+
+      document.getElementById('dashCardP2Name').textContent = getPartnerName('partner2');
+      document.getElementById('dashCardP2Clients').textContent = `${p2CliCount} cli`;
+      animateNumberElement(document.getElementById('dashCardP2Received'), p2Rec, true);
+      document.getElementById('dashCardP2Expected').textContent = fmtBRL(p2Exp);
+
+      // Alerts Segmented Switcher
+      document.getElementById('badgeDashToday').textContent = dueTodayList.length;
+      document.getElementById('badgeDashOverdue').textContent = overdueList.length;
+
+      const targetAlerts = dashAlertTab === 'today' ? dueTodayList : overdueList;
+      const alertsBox = document.getElementById('dashAlertsContainer');
+
+      if (targetAlerts.length === 0) {
+        alertsBox.innerHTML = `
+          <div class="surface-card rounded-3xl p-5 text-center text-xs text-sec stagger-item" style="--stagger-idx: 0">
+            ${dashAlertTab === 'today' ? 'Nenhum cliente pendente vencendo hoje.' : 'Nenhum cliente atrasado neste mês!'}
+          </div>
+        `;
+      } else {
+        alertsBox.innerHTML = targetAlerts.map((ch, idx) => `
+          <div class="surface-card rounded-2xl p-3.5 flex items-center justify-between gap-2.5 stagger-item" style="--stagger-idx: ${Math.min(idx, 10)}">
+            <div onclick="openClientDetailModal('${ch.clientId}')" class="flex items-center gap-3 min-w-0 cursor-pointer">
+              <div class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-xs shrink-0">
+                ${getInitials(ch.clientName)}
+              </div>
+              <div class="min-w-0">
+                <strong class="text-xs font-bold block truncate">${ch.clientName}</strong>
+                <span class="text-[11px] text-sec">${fmtBRL(ch.amount)} • Venc: ${fmtDateBR(ch.dueDate)} • ${getPartnerName(ch.partner)}</span>
+              </div>
+            </div>
+            <button onclick="confirmMonthlyPayment('${ch.id}')" class="btn-pill-cta px-3.5 py-2 text-[11px] shrink-0">
+              Receber
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+
+    window.switchDashAlertView = function(mode) {
+      dashAlertTab = mode;
+      document.getElementById('segDashToday').classList.toggle('active', mode === 'today');
+      document.getElementById('segDashOverdue').classList.toggle('active', mode === 'overdue');
+      renderDashboardView();
+    };
+
+    // Clean Avatar Customer Rows (Inspired by left phone in Reference Image)
+    window.renderClientsList = function() {
+      const q = (document.getElementById('clientSearchInput').value || '').toLowerCase().trim();
+      const pf = document.getElementById('clientFilterPartner').value;
+      const sf = document.getElementById('clientFilterStatus').value;
+
+      const filtered = state.clients
+        .filter(c => {
+          const mSearch = !q || (c.name || '').toLowerCase().includes(q) || (c.username || '').toLowerCase().includes(q) || (c.whatsapp || '').includes(q);
+          const mPartner = pf === 'all' || (c.partner || 'unassigned') === pf;
+          const mStatus = sf === 'all' || c.status === sf;
+          return mSearch && mPartner && mStatus;
+        })
+        .sort((a, b) => (Number(a.dueDay) || 1) - (Number(b.dueDay) || 1));
+
+      const wrapper = document.getElementById('clientsListWrapper');
+      if (filtered.length === 0) {
+        wrapper.innerHTML = `<div class="p-8 text-center text-xs text-sec">Nenhum cliente encontrado. Toque em "+ Novo" para cadastrar.</div>`;
+        return;
+      }
+
+      wrapper.innerHTML = filtered.map((c, idx) => {
+        const initials = getInitials(c.name);
+        const pBadge = getPartnerName(c.partner);
+        return `
+          <div onclick="openClientDetailModal('${c.id}')" class="p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-white/[0.02] active:bg-white/[0.05] transition stagger-item" style="--stagger-idx: ${Math.min(idx, 12)}">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-full border border-white/15 bg-violet-500/10 text-violet-300 font-bold text-xs flex items-center justify-center shrink-0">
+                ${initials}
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <strong class="text-xs font-bold truncate">${c.name}</strong>
+                  ${c.status !== 'active' ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-sec">Inativo</span>` : ''}
+                </div>
+                <span class="text-[11px] text-sec block truncate">Dia ${c.dueDay} • ${pBadge}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="text-right">
+                <span class="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-extrabold tracking-wider font-mono-num">${fmtBRL(c.amount)}</span>
+                <span class="text-[10px] text-mut font-mono-num block mt-0.5">•••• ${String(c.whatsapp || '0000').slice(-4)}</span>
+              </div>
+              <i class="ph-bold ph-caret-right text-xs text-sec"></i>
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    // Monthly Payments Tab
+    window.onBillingPeriodSelectChange = function() {
+      selectedMonth = document.getElementById('payMonthSelect').value;
+      selectedYear = document.getElementById('payYearSelect').value;
+      ensureCompetenceCharges(false);
+      renderAll();
+    };
+
+    window.setPaymentStatusFilter = function(st) {
+      paymentStatusFilter = st;
+      renderPaymentsList();
+    };
+
+    window.renderPaymentsList = function() {
+      document.getElementById('payMonthSelect').value = selectedMonth;
+      document.getElementById('payYearSelect').value = selectedYear;
+
+      ['all', 'pendente', 'atrasado', 'hoje', 'pago'].forEach(k => {
+        const pill = document.getElementById(`payPill-${k}`);
+        if (!pill) return;
+        if (k === paymentStatusFilter) {
+          pill.className = 'btn-pill-cta px-3.5 py-1.5 text-xs whitespace-nowrap';
+        } else {
+          pill.className = 'surface-card px-3.5 py-1.5 rounded-full text-xs font-semibold text-sec whitespace-nowrap';
+        }
+      });
+
+      const comp = `${selectedYear}-${selectedMonth}`;
+      const pf = document.getElementById('payPartnerSelect').value;
+      const q = (document.getElementById('paySearchInput').value || '').toLowerCase().trim();
+
+      const list = state.payments
+        .filter(p => p.competence === comp)
+        .filter(p => {
+          const st = getDynamicChargeStatus(p);
+          const mPartner = pf === 'all' || p.partner === pf;
+          const mQuery = !q || (p.clientName || '').toLowerCase().includes(q);
+          let mStatus = true;
+          if (paymentStatusFilter === 'pago') mStatus = st === 'pago';
+          else if (paymentStatusFilter === 'pendente') mStatus = st === 'pendente';
+          else if (paymentStatusFilter === 'atrasado') mStatus = st === 'atrasado';
+          else if (paymentStatusFilter === 'hoje') mStatus = st !== 'pago' && p.dueDate === todayISO;
+          return mPartner && mQuery && mStatus;
+        })
+        .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+
+      const totalSum = list.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+      document.getElementById('payCountLabel').textContent = list.length;
+      document.getElementById('paySumLabel').textContent = fmtBRL(totalSum);
+
+      const box = document.getElementById('paymentsListWrapper');
+      if (list.length === 0) {
+        box.innerHTML = `<div class="surface-card rounded-3xl p-8 text-center text-xs text-sec">Nenhuma cobrança encontrada neste filtro.</div>`;
+        return;
+      }
+
+      box.innerHTML = list.map((ch, idx) => {
+        const st = getDynamicChargeStatus(ch);
+        const badge = st === 'pago'
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400">PAGO</span>`
+          : st === 'atrasado'
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400">ATRASADO</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400">PENDENTE</span>`;
+
+        const cta = st === 'pago'
+          ? `<button onclick="undoMonthlyPayment('${ch.id}')" class="surface-card px-3.5 py-2 rounded-full text-[11px] font-bold text-sec">Estornar</button>`
+          : `<button onclick="confirmMonthlyPayment('${ch.id}')" class="btn-pill-cta px-4 py-2 text-xs">Receber</button>`;
+
+        return `
+          <div class="surface-card rounded-2xl p-3.5 flex items-center justify-between gap-2.5 stagger-item" style="--stagger-idx: ${Math.min(idx, 12)}">
+            <div onclick="openClientDetailModal('${ch.clientId}')" class="flex items-center gap-3 min-w-0 cursor-pointer">
+              <div class="w-9 h-9 rounded-full border border-white/10 bg-white/5 flex items-center justify-center font-bold text-xs shrink-0">
+                ${getInitials(ch.clientName)}
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <strong class="text-xs font-bold truncate">${ch.clientName}</strong>
+                  ${badge}
+                </div>
+                <span class="text-[11px] text-sec block">
+                  ${fmtBRL(ch.amount)} • Venc: ${fmtDateBR(ch.dueDate)} • ${getPartnerName(ch.partner)}
+                </span>
+                ${ch.paidAt ? `<span class="text-[10px] text-emerald-400 block">Confirmado por ${ch.confirmedByPartnerName} em ${ch.paidAt}</span>` : ''}
+              </div>
+            </div>
+            <div class="shrink-0">${cta}</div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    function renderPartnersView() {
+      const comp = `${selectedYear}-${selectedMonth}`;
+      const active = state.clients.filter(c => c.status === 'active');
+      const monthCharges = state.payments.filter(p => p.competence === comp);
+
+      const p1Cli = active.filter(c => c.partner === 'partner1');
+      const p2Cli = active.filter(c => c.partner === 'partner2');
+      const unCli = active.filter(c => !c.partner || c.partner === 'unassigned');
+
+      let p1Exp = 0, p1Rec = 0, p1Pen = 0;
+      let p2Exp = 0, p2Rec = 0, p2Pen = 0;
+
+      monthCharges.forEach(ch => {
+        const amt = Number(ch.amount) || 0;
+        const st = getDynamicChargeStatus(ch);
+        if (ch.partner === 'partner2') {
+          p2Exp += amt;
+          if (st === 'pago') p2Rec += amt;
+          else p2Pen += amt;
+        } else {
+          p1Exp += amt;
+          if (st === 'pago') p1Rec += amt;
+          else p1Pen += amt;
+        }
+      });
+
+      document.getElementById('partnerTabAvatar1').textContent = getInitials(getPartnerName('partner1'));
+      document.getElementById('partnerTabName1').textContent = getPartnerName('partner1');
+      document.getElementById('partnerTabShare1').textContent = `${p1Cli.length} cliente(s) ativo(s)`;
+      animateNumberElement(document.getElementById('partnerTabExp1'), p1Exp, true);
+      animateNumberElement(document.getElementById('partnerTabRec1'), p1Rec, true);
+      animateNumberElement(document.getElementById('partnerTabPen1'), p1Pen, true);
+      const bar1 = document.getElementById('partnerTabBar1');
+      if (bar1) bar1.style.width = `${p1Exp > 0 ? Math.round((p1Rec / p1Exp) * 100) : 0}%`;
+
+      document.getElementById('partnerTabAvatar2').textContent = getInitials(getPartnerName('partner2'));
+      document.getElementById('partnerTabName2').textContent = getPartnerName('partner2');
+      document.getElementById('partnerTabShare2').textContent = `${p2Cli.length} cliente(s) ativo(s)`;
+      animateNumberElement(document.getElementById('partnerTabExp2'), p2Exp, true);
+      animateNumberElement(document.getElementById('partnerTabRec2'), p2Rec, true);
+      animateNumberElement(document.getElementById('partnerTabPen2'), p2Pen, true);
+      const bar2 = document.getElementById('partnerTabBar2');
+      if (bar2) bar2.style.width = `${p2Exp > 0 ? Math.round((p2Rec / p2Exp) * 100) : 0}%`;
+
+      document.getElementById('unassignedBadgeCount').textContent = `${unCli.length} sem sócio`;
+
+      const listEl = document.getElementById('partnerQuickAssignList');
+      if (active.length === 0) {
+        listEl.innerHTML = `<p class="text-xs text-sec text-center py-3">Cadastre clientes para atribuir aos sócios.</p>`;
+        return;
+      }
+
+      listEl.innerHTML = active.map(c => `
+        <div class="p-2.5 rounded-2xl border flex items-center justify-between gap-2" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <div class="min-w-0">
+            <strong class="text-xs font-bold block truncate">${c.name}</strong>
+            <span class="text-[10px] text-sec">${fmtBRL(c.amount)} • Dia ${c.dueDay}</span>
+          </div>
+          <div class="flex gap-1 shrink-0">
+            <button onclick="assignPartnerDirect('${c.id}', 'partner1')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition ${c.partner === 'partner1' ? 'bg-violet-600 text-white' : 'surface-card text-sec'}">
+              ${getPartnerName('partner1')}
+            </button>
+            <button onclick="assignPartnerDirect('${c.id}', 'partner2')" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition ${c.partner === 'partner2' ? 'bg-emerald-600 text-white' : 'surface-card text-sec'}">
+              ${getPartnerName('partner2')}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAuditList() {
+      const box = document.getElementById('auditLogList');
+      if (!box) return;
+      if (state.auditLogs.length === 0) {
+        box.innerHTML = `<p class="text-[11px] text-sec py-2">Nenhuma alteração registrada ainda.</p>`;
+        return;
+      }
+      box.innerHTML = state.auditLogs.slice(0, 25).map(l => `
+        <div class="p-2.5 rounded-xl border text-[11px] flex items-center justify-between gap-2" style="background: var(--bg-input); border-color: var(--border-subtle);">
+          <div class="truncate">
+            <strong class="text-violet-400">${l.partnerName}:</strong> <strong>${l.action}</strong> — <span class="text-sec">${l.details}</span>
+          </div>
+          <span class="text-[9px] text-mut shrink-0">${l.timestamp}</span>
+        </div>
+      `).join('');
+    }
+
+    // ========================================================
+    // 13. NAVIGATION, SETTINGS, BACKUP & APK EXPORT
+    // ========================================================
+    const tabOrder = ['dashboard', 'clients', 'payments', 'partners', 'settings'];
+    let currentTabIdx = 0;
+
+    window.switchTab = function(tabId) {
+      const nextIdx = tabOrder.indexOf(tabId);
+      const dirClass = nextIdx >= currentTabIdx ? 'tab-anim-right' : 'tab-anim-left';
+      currentTabIdx = nextIdx >= 0 ? nextIdx : 0;
+
+      document.querySelectorAll('.tab-view').forEach(s => {
+        s.classList.add('hidden');
+        s.classList.remove('tab-anim-right', 'tab-anim-left');
+      });
+
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) {
+        target.classList.remove('hidden');
+        void target.offsetWidth; // Trigger reflow for smooth directional animation
+        target.classList.add(dirClass);
+      }
+
+      // Slide the bottom navigation indicator pill smoothly
+      const pill = document.getElementById('navSlidingPill');
+      if (pill && nextIdx >= 0) {
+        pill.style.transform = `translate3d(calc(${nextIdx} * 100% + ${nextIdx * 4}px), 0, 0)`;
+      }
+
+      tabOrder.forEach(t => {
+        const btn = document.getElementById(`navBtn-${t}`);
+        if (!btn) return;
+        const icon = btn.querySelector('i');
+        if (t === tabId) {
+          btn.className = 'flex flex-col items-center justify-center py-1.5 rounded-2xl text-violet-400 font-bold transition spring-tap';
+          if (icon) icon.style.transform = ' translateY(-2px) scale(1.1)';
+        } else {
+          btn.className = 'flex flex-col items-center justify-center py-1.5 rounded-2xl text-sec hover:opacity-80 transition spring-tap';
+          if (icon) icon.style.transform = 'translateY(0) scale(1)';
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.changeCompetenceMonth = function(delta) {
+      let m = parseInt(selectedMonth, 10) + delta;
+      let y = parseInt(selectedYear, 10);
+      if (m < 1) { m = 12; y -= 1; }
+      if (m > 12) { m = 1; y += 1; }
+      selectedMonth = String(m).padStart(2, '0');
+      selectedYear = String(y);
+      ensureCompetenceCharges(false);
+      renderAll();
+    };
+
+    window.saveGeneralSettings = function(e) {
+      e.preventDefault();
+      state.settings.serviceUrl = document.getElementById('cfgServiceUrl').value.trim();
+      state.settings.partner1Name = document.getElementById('cfgPartner1Name').value.trim() || 'Sócio 1';
+      state.settings.partner2Name = document.getElementById('cfgPartner2Name').value.trim() || 'Sócio 2';
+
+      persistLocalState();
+      syncDocToCloud('settings', 'global', state.settings);
+      logAudit('Ajustes Salvos', `Sócios: ${state.settings.partner1Name} & ${state.settings.partner2Name}`);
+      renderAll();
+      showToast('Configurações e nomes salvos!');
+    };
+
+    function copyToClipboard(text, toastMsg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(toastMsg);
+      } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    window.copyGlobalServiceLink = function() {
+      copyToClipboard(state.settings.serviceUrl || '', 'Link único copiado!');
+    };
+
+    window.exportDataBackup = function() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `duopay-backup-${todayISO}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Backup exportado!');
+    };
+
+    window.importDataBackup = async function(ev) {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      try {
+        const parsed = JSON.parse(await file.text());
+        state = { ...state, ...parsed };
+        persistLocalState();
+        renderAll();
+        showToast('Backup restaurado com sucesso!');
+      } catch (e) {
+        showToast('Arquivo de backup inválido.');
+      }
+    };
+
+    // ========================================================
+    // 14. INITIALIZE APP ON LOAD
+    // ========================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      applyTheme(state.theme || 'dark');
+      switchTab('dashboard');
+      initAndroidServiceWorker();
+      ensureCompetenceCharges(false);
+      renderAll();
+      initCloudSync();
+    });
+  </script>
+</body>
+</html>
