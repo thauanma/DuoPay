@@ -7,6 +7,8 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" id="pwaManifestLink" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230d0d12'/%3E%3Ccircle cx='256' cy='256' r='160' fill='%237c3aed' opacity='0.25'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='800' font-size='180'%3EDP%3C/text%3E%3C/svg%3E" />
   <title>DuoPay — Gestão de Assinaturas</title>
 
   <!-- Tailwind CSS -->
@@ -2221,12 +2223,39 @@
     // ========================================================
     let swRegistration = null;
 
+    function injectPwaManifest() {
+      try {
+        const iconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230d0d12'/%3E%3Ccircle cx='256' cy='256' r='160' fill='%237c3aed' opacity='0.3'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='800' font-size='180'%3EDP%3C/text%3E%3C/svg%3E";
+        const manifestObj = {
+          name: "DuoPay — Gestão de Assinaturas",
+          short_name: "DuoPay",
+          description: "Gestão de assinaturas mensais e divisão entre sócios",
+          start_url: window.location.pathname || "/",
+          scope: "/",
+          display: "standalone",
+          orientation: "portrait",
+          background_color: "#0d0d12",
+          theme_color: "#0d0d12",
+          icons: [
+            { src: iconSvg, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+            { src: iconSvg, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+          ]
+        };
+        const blob = new Blob([JSON.stringify(manifestObj)], { type: "application/manifest+json" });
+        const linkEl = document.getElementById("pwaManifestLink");
+        if (linkEl) linkEl.href = URL.createObjectURL(blob);
+      } catch (e) {}
+    }
+
     async function initAndroidServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
       try {
         const swCode = `
           self.addEventListener('install', (e) => self.skipWaiting());
           self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+          });
           self.addEventListener('notificationclick', (event) => {
             event.notification.close();
             event.waitUntil(
@@ -2961,6 +2990,7 @@
     // 14. INITIALIZE APP ON LOAD
     // ========================================================
     window.addEventListener('DOMContentLoaded', () => {
+      injectPwaManifest();
       applyTheme(state.theme || 'dark');
       switchTab('dashboard');
       initAndroidServiceWorker();
