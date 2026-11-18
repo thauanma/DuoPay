@@ -8,11 +8,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.json" />
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
-  }
-</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+    }
+  </script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230d0d12'/%3E%3Ccircle cx='256' cy='256' r='160' fill='%237c3aed' opacity='0.25'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='800' font-size='180'%3EDP%3C/text%3E%3C/svg%3E" />
   <title>DuoPay — Gestão de Assinaturas</title>
 
@@ -456,7 +456,7 @@
           </button>
         </div>
 
-        <!-- Right: Theme Cycle + Notifications + APK -->
+        <!-- Right: Theme Cycle + Notifications -->
         <div class="flex items-center gap-1.5">
           <button onclick="cycleTheme()" id="themeCycleBtn" class="w-9 h-9 rounded-full border flex items-center justify-center active:scale-90 transition" style="background: var(--bg-input); border-color: var(--border-subtle);" title="Alternar Tema: Escuro / AMOLED / Claro">
             <i id="themeCycleIcon" class="ph-bold ph-moon-stars text-base"></i>
@@ -1487,7 +1487,6 @@
       return (Number(val) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    // Smooth 60fps Number Roll / Count-Up Animation for Currency & Integers
     const activeNumAnimations = new WeakMap();
     function animateNumberElement(el, targetValue, isCurrency = true, duration = 520) {
       if (!el) return;
@@ -1508,7 +1507,6 @@
       function step(nowTime) {
         const elapsed = nowTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        // EaseOutExpo for snappy fintech feel
         const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
         const current = prev + (target - prev) * eased;
         el.textContent = isCurrency ? fmtBRL(current) : String(Math.round(current));
@@ -1521,7 +1519,6 @@
       activeNumAnimations.set(el, requestAnimationFrame(step));
     }
 
-    // Spring Modal Open & Instant Close Helper
     function openSpringModal(modalId) {
       const modal = document.getElementById(modalId);
       if (!modal) return;
@@ -1635,8 +1632,8 @@
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.18); // A5
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.18);
         gain.gain.setValueAtTime(0.12, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
         osc.connect(gain);
@@ -1723,7 +1720,6 @@
       state.settings.partner2Name = p2;
       persistLocalState();
 
-      // Close modal immediately before cloud sync
       closePartnerProfileModal();
       renderAll();
       logAudit('Sócios Renomeados', `Nomes definidos como ${p1} e ${p2}`);
@@ -1809,7 +1805,6 @@
       closeSpringModal('clientModal', true);
     };
 
-    // CRITICAL FIX: Synchronous state update + immediate modal close
     window.handleSaveClient = async function(e) {
       e.preventDefault();
 
@@ -1823,7 +1818,6 @@
       const partner = document.getElementById('fieldClientPartner').value;
       const status = document.getElementById('fieldClientStatus').value;
 
-      // Close modal immediately so the user never gets stuck on mobile
       closeClientModal();
 
       const encryptedPassword = await encryptClientPassword(plainPassword);
@@ -1850,7 +1844,6 @@
         state.clients.push(clientObj);
       }
 
-      // Update or create current competence charge
       const comp = `${selectedYear}-${selectedMonth}`;
       const payId = `${clientId}_${comp}`;
       const dueDate = buildDueDate(selectedYear, selectedMonth, dueDay);
@@ -1959,7 +1952,6 @@
       logAudit('Pagamento Recebido', `${state.payments[idx].clientName} (${state.payments[idx].month}/${state.payments[idx].year}) - ${fmtBRL(state.payments[idx].amount)}`);
       renderAll();
 
-      // Show sleek Payment Receipt Modal inspired by the middle phone in reference image
       const ch = state.payments[idx];
       lastReceiptData = ch;
       document.getElementById('recClientName').textContent = ch.clientName;
@@ -1970,7 +1962,6 @@
       document.getElementById('recDateTime').textContent = ch.paidAt;
       document.getElementById('recTxId').textContent = ch.txId || '#DP-92KD';
 
-      // Re-trigger SVG checkmark stroke draw & ticket spring unfold
       const badge = document.getElementById('receiptCheckBadge');
       const ticket = document.getElementById('receiptTicketBox');
       if (badge) {
@@ -2156,7 +2147,6 @@
       const client = state.clients.find(c => c.id === clientId);
       if (!client) return;
       state.clients = state.clients.filter(c => c.id !== clientId);
-      // Remove only unpaid charges so historical paid revenue stays intact
       const toRemove = state.payments.filter(p => p.clientId === clientId && p.status !== 'pago');
       state.payments = state.payments.filter(p => !(p.clientId === clientId && p.status !== 'pago'));
 
@@ -2228,37 +2218,15 @@
     // ========================================================
     let swRegistration = null;
 
-   function injectPwaManifest() {
-      // Manifesto agora carregado diretamente via /manifest.json
+    function injectPwaManifest() {
+      // Manifesto carregado via /manifest.json
     }
-    
+
     async function initAndroidServiceWorker() {
       if (!('serviceWorker' in navigator)) return;
       try {
-        const swCode = `
-          self.addEventListener('install', (e) => self.skipWaiting());
-          self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-          self.addEventListener('fetch', (e) => {
-            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-          });
-          self.addEventListener('notificationclick', (event) => {
-            event.notification.close();
-            event.waitUntil(
-              self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-                if (clientList.length > 0) return clientList[0].focus();
-                return self.clients.openWindow('/');
-              })
-            );
-          });
-        `;
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        swRegistration = await navigator.serviceWorker.register(swUrl);
-      } catch (e) {
-        try {
-          swRegistration = await navigator.serviceWorker.ready;
-        } catch (_) {}
-      }
+        swRegistration = await navigator.serviceWorker.ready;
+      } catch (_) {}
     }
 
     function getCapacitorLocalNotifications() {
@@ -2302,7 +2270,6 @@
         return;
       }
 
-      // 1. Check Native APK (Capacitor LocalNotifications)
       if (capNotif) {
         try {
           const perm = await capNotif.requestPermissions();
@@ -2318,7 +2285,6 @@
         } catch (e) {}
       }
 
-      // 2. Check Android WebAPK / Chrome Notification API
       if ('Notification' in window) {
         try {
           const permission = await Notification.requestPermission();
@@ -2346,7 +2312,6 @@
     async function dispatchSystemNotification(title, body, tagId) {
       const capNotif = getCapacitorLocalNotifications();
 
-      // Priority 1: Native Android APK via Capacitor LocalNotifications
       if (capNotif) {
         try {
           const nowId = Math.floor(Math.random() * 900000) + 1000;
@@ -2372,7 +2337,6 @@
         } catch (e) {}
       }
 
-      // Priority 2: Android ServiceWorker showNotification (System Status Bar with Vibration)
       if ('Notification' in window && Notification.permission === 'granted') {
         const options = {
           body,
@@ -2492,12 +2456,10 @@
       const p1Name = getPartnerName('partner1');
       const p2Name = getPartnerName('partner2');
 
-      // Update Header Partner Display
       document.getElementById('headerPartnerInitials').textContent = getInitials(getActiveOperatorName());
       document.getElementById('headerActivePartnerName').textContent = getActiveOperatorName();
       document.getElementById('headerCompetenceText').textContent = `${getMonthName(selectedMonth).slice(0, 3)} ${selectedYear}`;
 
-      // Update all partner select options across tabs/modals
       ['optClientPartner1', 'optPayPartner1', 'modalOptPartner1'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.textContent = p1Name;
@@ -2507,7 +2469,6 @@
         if (el) el.textContent = p2Name;
       });
 
-      // Settings form sync
       document.getElementById('cfgServiceUrl').value = state.settings.serviceUrl || '';
       document.getElementById('cfgPartner1Name').value = p1Name;
       document.getElementById('cfgPartner2Name').value = p2Name;
@@ -2576,7 +2537,6 @@
       animateNumberElement(document.getElementById('kpiOverdueCount'), overdueCount, false);
       document.getElementById('kpiDueTodaySub').textContent = `${dueTodayList.length} vencem hoje`;
 
-      // Partner cards on Dashboard
       const p1CliCount = activeClients.filter(c => c.partner === 'partner1').length;
       const p2CliCount = activeClients.filter(c => c.partner === 'partner2').length;
       document.getElementById('dashCardP1Name').textContent = getPartnerName('partner1');
@@ -2589,7 +2549,6 @@
       animateNumberElement(document.getElementById('dashCardP2Received'), p2Rec, true);
       document.getElementById('dashCardP2Expected').textContent = fmtBRL(p2Exp);
 
-      // Alerts Segmented Switcher
       document.getElementById('badgeDashToday').textContent = dueTodayList.length;
       document.getElementById('badgeDashOverdue').textContent = overdueList.length;
 
@@ -2629,7 +2588,6 @@
       renderDashboardView();
     };
 
-    // Clean Avatar Customer Rows (Inspired by left phone in Reference Image)
     window.renderClientsList = function() {
       const q = (document.getElementById('clientSearchInput').value || '').toLowerCase().trim();
       const pf = document.getElementById('clientFilterPartner').value;
@@ -2680,7 +2638,6 @@
       }).join('');
     };
 
-    // Monthly Payments Tab
     window.onBillingPeriodSelectChange = function() {
       selectedMonth = document.getElementById('payMonthSelect').value;
       selectedYear = document.getElementById('payYearSelect').value;
@@ -2859,7 +2816,7 @@
     }
 
     // ========================================================
-    // 13. NAVIGATION, SETTINGS, BACKUP & APK EXPORT
+    // 13. NAVIGATION, SETTINGS & BACKUP
     // ========================================================
     const tabOrder = ['dashboard', 'clients', 'payments', 'partners', 'settings'];
     let currentTabIdx = 0;
@@ -2877,11 +2834,10 @@
       const target = document.getElementById(`tab-${tabId}`);
       if (target) {
         target.classList.remove('hidden');
-        void target.offsetWidth; // Trigger reflow for smooth directional animation
+        void target.offsetWidth;
         target.classList.add(dirClass);
       }
 
-      // Slide the bottom navigation indicator pill smoothly
       const pill = document.getElementById('navSlidingPill');
       if (pill && nextIdx >= 0) {
         pill.style.transform = `translate3d(calc(${nextIdx} * 100% + ${nextIdx * 4}px), 0, 0)`;
@@ -2893,7 +2849,7 @@
         const icon = btn.querySelector('i');
         if (t === tabId) {
           btn.className = 'flex flex-col items-center justify-center py-1.5 rounded-2xl text-violet-400 font-bold transition spring-tap';
-          if (icon) icon.style.transform = ' translateY(-2px) scale(1.1)';
+          if (icon) icon.style.transform = 'translateY(-2px) scale(1.1)';
         } else {
           btn.className = 'flex flex-col items-center justify-center py-1.5 rounded-2xl text-sec hover:opacity-80 transition spring-tap';
           if (icon) icon.style.transform = 'translateY(0) scale(1)';
